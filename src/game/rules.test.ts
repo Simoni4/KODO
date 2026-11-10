@@ -304,8 +304,8 @@ test('AI Race uses a longer 18x18 symmetric arena with equal legal routes', () =
 test('AI Race contains winding routes and moderate-height obstacles without giant cliffs', () => {
   const arena = generateFairRaceArena(18);
   assert.ok(isRaceArenaFair(arena));
-  assert.ok(arena.grid.some((row) => row.some((height) => height === 3)), 'Generated map should contain raised blocks');
-  assert.ok(arena.grid.every((row) => row.every((height) => height <= 3)), 'No screen-filling cliff heights');
+  assert.ok(arena.grid.some((row) => row.some((height) => height === 2)), 'Generated map should contain low raised blocks');
+  assert.ok(arena.grid.every((row) => row.every((height) => height <= 2)), 'Race blocks must stay low for visibility');
   const isWalkable = (x: number, y: number) =>
     x >= 0 && x < arena.size && y >= 0 && y < arena.size && arena.grid[y][x] > 0;
   const canStep = (fromX: number, fromY: number, toX: number, toY: number) =>
@@ -313,14 +313,14 @@ test('AI Race contains winding routes and moderate-height obstacles without gian
     Math.abs(arena.grid[fromY][fromX] - arena.grid[toY][toX]) <= 1;
   const route = bfsShortestPath(arena.spawns[0], arena.finish, isWalkable, arena.size, arena.size, canStep);
   assert.ok(route && route.length >= 16, 'Race route should require at least 16 moves');
-  assert.ok(route?.some((point) => arena.grid[point.y][point.x] === 3), 'Route should include elevated platforms');
+  assert.ok(route?.some((point) => arena.grid[point.y][point.x] === 2), 'Route should include elevated platforms');
 });
 
 test('Procedural Survival Arena generates a spacious 18x18 board with four safe spawn pads', () => {
   for (let run = 0; run < 10; run++) {
-    const { tiles, players } = initSurvivalArena(18);
+    const { tiles, players } = initSurvivalArena(22);
     assert.equal(players.length, 4);
-    assert.ok(tiles.size > 150, 'Arena should have a broad playable floor');
+    assert.ok(tiles.size > 400, 'Arena should have a very broad open playable floor');
     for (const p of players) {
       const t = tiles.get(`${p.x},${p.y}`);
       assert.ok(t && t.state === 'stable', `Spawn for ${p.name} must be stable`);
@@ -336,12 +336,8 @@ test('Survival arena has a low open-front enclosure and safe inner spawn pads', 
     assert.ok(spawn && spawn.state === 'stable');
     assert.equal(spawn?.elevation, 0);
   }
-  for (let i = 2; i <= 15; i++) {
-    assert.equal(tiles.get(`${i},2`)?.elevation, 2, 'Rear rim should be low');
-    assert.equal(tiles.get(`2,${i}`)?.elevation, 2, 'Left rim should be low');
-    assert.equal(tiles.get(`15,${i}`)?.elevation, 2, 'Right rim should be low');
-  }
-  assert.equal(tiles.has('8,15'), true, 'Front side should remain open for visibility');
+  assert.equal(tiles.size > 400, true, 'No perimeter should be removed from the open floor');
+  assert.ok(Array.from(tiles.values()).every((tile) => tile.elevation <= 2), 'No high enclosing walls');
   assert.ok(Array.from(tiles.values()).some((tile) => tile.elevation === 1));
 });
 
@@ -351,7 +347,7 @@ test('Crate pushing and Survival push physics work accurately', () => {
   assert.equal(canPushCrate({ x: 1, y: 0 }, 0, 1, isCellBlocked), true);
   assert.deepEqual(resolvePushDestination({ x: 1, y: 0 }, 0, 1), { x: 1, y: 1 });
 
-  const walkCheck = (x: number, y: number) => x >= 0 && x < 14 && y >= 0 && y < 14;
+  const walkCheck = (x: number, y: number) => x >= 0 && x < 22 && y >= 0 && y < 22;
   const resultSafe = processPush({ x: 5, y: 5 }, { x: 6, y: 5 }, 1, 0, walkCheck);
   assert.deepEqual(resultSafe.pushedTo, { x: 7, y: 5 });
   assert.equal(resultSafe.fell, false);
