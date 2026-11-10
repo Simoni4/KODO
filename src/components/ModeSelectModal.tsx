@@ -1,6 +1,6 @@
 import React from 'react';
 import { GameMode } from '../game/types';
-import { Mountain, Zap, Flame, Trophy, ChevronRight, X, Sparkles } from 'lucide-react';
+import { Mountain, Zap, Flame, Trophy, ChevronRight, X, Sparkles, Swords } from 'lucide-react';
 
 interface ModeSelectModalProps {
   currentCampaignLevel: number;
@@ -122,6 +122,25 @@ export const ModeSelectModal: React.FC<ModeSelectModalProps> = ({
               </div>
             </div>
             <div className="w-8 h-8 rounded-full bg-rose-500/30 group-hover:bg-rose-500/50 flex items-center justify-center text-rose-300 transition-colors">
+              <ChevronRight className="w-5 h-5" />
+            </div>
+          </button>
+
+          {/* 4. Eat All Arena */}
+          <button
+            onClick={() => onSelectMode('arena')}
+            className="group relative flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-violet-950/70 to-fuchsia-900/60 border-2 border-violet-500/40 hover:border-violet-400 shadow-lg text-left transition-all cursor-pointer active:scale-98"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-violet-500/20 border border-violet-400/50 flex items-center justify-center text-violet-300">
+                <Swords className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-white group-hover:text-violet-200 transition-colors">Eat All Arena</h3>
+                <p className="text-xs text-violet-200/70">8 contestants · Eat rivals by landing on their tile</p>
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-violet-500/30 flex items-center justify-center text-violet-300">
               <ChevronRight className="w-5 h-5" />
             </div>
           </button>
