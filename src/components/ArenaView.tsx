@@ -206,3 +206,20 @@ export const ArenaView: React.FC<ArenaViewProps> = ({ isPaused = false, onComple
     <canvas ref={canvasRef} width={720} height={860} onPointerDown={handlePointerDown} className="w-full h-full max-w-lg object-contain cursor-pointer select-none touch-none" />
   </div>;
 };
+
+export const ArenaResultsModal: React.FC<{ placements: ArenaPlacement[]; onRetry: () => void; onMainMenu: () => void }> = ({ placements, onRetry, onMainMenu }) => (
+  <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm">
+    <div className="w-full max-w-sm rounded-3xl border-2 border-amber-400/50 bg-slate-900 p-5 text-center shadow-2xl">
+      <div className="text-5xl mb-1">🏆</div>
+      <h2 className="text-2xl font-black uppercase text-amber-300">1st Place</h2>
+      <p className="text-sm text-slate-300 mb-4">{placements.find(p => p.place === 1)?.name || 'Winner'} wins the arena!</p>
+      <div className="space-y-1.5 mb-5 text-left">
+        {placements.map(p => <div key={p.id} className={`flex items-center justify-between rounded-xl px-3 py-2 ${p.place === 1 ? 'bg-amber-400/15 border border-amber-400/40' : 'bg-slate-800'}`}>
+          <span className="flex items-center gap-2 text-sm font-bold text-white"><span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor:p.color}} />{p.name}</span>
+          <span className={`text-sm font-black ${p.place === 1 ? 'text-amber-300' : 'text-slate-300'}`}>{p.place}{p.place === 1 ? 'st' : p.place === 2 ? 'nd' : p.place === 3 ? 'rd' : 'th'}</span>
+        </div>)}
+      </div>
+      <div className="flex gap-2"><button onClick={onRetry} className="flex-1 rounded-xl bg-violet-600 py-3 text-sm font-black uppercase text-white">Play Again</button><button onClick={onMainMenu} className="flex-1 rounded-xl bg-slate-700 py-3 text-sm font-black uppercase text-white">Main Menu</button></div>
+    </div>
+  </div>
+);
