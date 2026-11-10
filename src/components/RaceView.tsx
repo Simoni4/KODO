@@ -250,74 +250,76 @@ export const RaceView: React.FC<RaceViewProps> = ({
     if (!raceActive || isPaused) return;
 
     botTimerRef.current = setInterval(() => {
-      setBots((prevBots) => {
-        const curPlayer = playerPosRef.current;
-        const curArena = arenaRef.current;
+      const prevBots = botsRef.current;
+      const curArena = arenaRef.current;
+      let nextPlayerPos = playerPosRef.current;
 
-        const updated = prevBots.map((bot) => {
-          if (!bot.alive) return bot;
+      const updated = prevBots.map((bot) => {
+        if (!bot.alive) return bot;
 
-          // Every bot moves once per shared AI tick; personality affects route choice, never speed.
+        // Personalities change only shortest-route tie-breaking, never movement speed.
+        const directionOrder =
+          bot.personality === 'aggressive'
+            ? [{ x: -1, y: 0 }, { x: 0, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 1 }]
+            : bot.personality === 'tricky'
+              ? [{ x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }, { x: 1, y: 0 }]
+              : [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: -1 }];
 
-          // Personalities change only shortest-route tie-breaking, never movement speed.
-          const directionOrder =
-            bot.personality === 'aggressive'
-              ? [{ x: -1, y: 0 }, { x: 0, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 1 }]
-              : bot.personality === 'tricky'
-                ? [{ x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }, { x: 1, y: 0 }]
-                : [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: -1 }];
+        const path = bfsShortestPath(
+          { x: bot.x, y: bot.y },
+          curArena.finish,
+          isCellWalkableSync,
+          curArena.size,
+          curArena.size,
+          (fromX, fromY, toX, toY) =>
+            canStepBetweenSync(fromX, fromY, toX, toY),
+          directionOrder
+        );
 
-          const path = bfsShortestPath(
-            { x: bot.x, y: bot.y },
-            curArena.finish,
-            isCellWalkableSync,
-            curArena.size,
-            curArena.size,
-            (fromX, fromY, toX, toY) =>
-              canStepBetweenSync(fromX, fromY, toX, toY),
-            directionOrder
-          );
+        if (!path || path.length === 0) return bot;
 
-          if (path && path.length > 0) {
-            const nextStep = path[0];
-            if (!canStepBetweenSync(bot.x, bot.y, nextStep.x, nextStep.y)) {
-              return bot;
-            }
-
-            const anotherBotOnStep = prevBots.some(
-              (other) =>
-                other.alive &&
-                other.id !== bot.id &&
-                other.x === nextStep.x &&
-                other.y === nextStep.y
-            );
-            if (anotherBotOnStep) return bot;
-
-            if (nextStep.x === curPlayer.x && nextStep.y === curPlayer.y) {
-              const pushDx = nextStep.x - bot.x;
-              const pushDy = nextStep.y - bot.y;
-              const pushedPX = curPlayer.x + pushDx;
-              const pushedPY = curPlayer.y + pushDy;
-
-              // If the player cannot legally be pushed, the bot waits instead of swapping positions.
-              if (!canStepBetweenSync(curPlayer.x, curPlayer.y, pushedPX, pushedPY)) {
-                return bot;
-              }
-
-              KodoAudioManager.playPush();
-              const pNext = { x: pushedPX, y: pushedPY };
-              playerPosRef.current = pNext;
-              setPlayerPos(pNext);
-            }
-
-            return { ...bot, x: nextStep.x, y: nextStep.y };
-          }
+        const nextStep = path[0];
+        if (!canStepBetweenSync(bot.x, bot.y, nextStep.x, nextStep.y)) {
           return bot;
-        });
+        }
 
-        botsRef.current = updated;
-        return updated;
+        const anotherBotOnStep = prevBots.some(
+          (other) =>
+            other.alive &&
+            other.id !== bot.id &&
+            other.x === nextStep.x &&
+            other.y === nextStep.y
+        );
+        if (anotherBotOnStep) return bot;
+
+        if (nextStep.x === nextPlayerPos.x && nextStep.y === nextPlayerPos.y) {
+          const pushDx = nextStep.x - bot.x;
+          const pushDy = nextStep.y - bot.y;
+          const pushedPX = nextPlayerPos.x + pushDx;
+          const pushedPY = nextPlayerPos.y + pushDy;
+
+          // If the player cannot legally be pushed, the bot waits instead of swapping positions.
+          if (!canStepBetweenSync(nextPlayerPos.x, nextPlayerPos.y, pushedPX, pushedPY)) {
+            return bot;
+          }
+
+          KodoAudioManager.playPush();
+          nextPlayerPos = { x: pushedPX, y: pushedPY };
+        }
+
+        return { ...bot, x: nextStep.x, y: nextStep.y };
       });
+
+      botsRef.current = updated;
+      setBots(updated);
+
+      if (
+        nextPlayerPos.x !== playerPosRef.current.x ||
+        nextPlayerPos.y !== playerPosRef.current.y
+      ) {
+        playerPosRef.current = nextPlayerPos;
+        setPlayerPos(nextPlayerPos);
+      }
     }, 850);
 
     return () => {
