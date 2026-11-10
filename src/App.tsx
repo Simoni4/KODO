@@ -456,10 +456,10 @@ export default function App() {
           <PauseModal
             onResume={() => setScreen('playing')}
             onRestart={handleRestart}
-            onOpenLevels={() => {
+            onOpenLevels={mode === 'campaign' ? () => {
               setScreen('playing');
               setShowLevelSelect(true);
-            }}
+            } : undefined}
             onMainMenu={handleMainMenu}
           />
         )}
