@@ -298,8 +298,20 @@ export const RaceView: React.FC<RaceViewProps> = ({
           const pushedPX = nextPlayerPos.x + pushDx;
           const pushedPY = nextPlayerPos.y + pushDy;
 
-          // If the player cannot legally be pushed, the bot waits instead of swapping positions.
-          if (!canStepBetweenSync(nextPlayerPos.x, nextPlayerPos.y, pushedPX, pushedPY)) {
+          const pushedDestinationOccupied = prevBots.some(
+            (other) =>
+              other.alive &&
+              other.id !== bot.id &&
+              other.x === pushedPX &&
+              other.y === pushedPY
+          );
+
+          // If the player cannot legally be pushed, or another bot occupies the landing tile,
+          // the bot waits instead of swapping positions or stacking contestants.
+          if (
+            !canStepBetweenSync(nextPlayerPos.x, nextPlayerPos.y, pushedPX, pushedPY) ||
+            pushedDestinationOccupied
+          ) {
             return bot;
           }
 
