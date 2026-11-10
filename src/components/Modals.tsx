@@ -98,6 +98,8 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
 interface SettingsModalProps {
   sfxEnabled: boolean;
   musicEnabled: boolean;
+  nickname: string;
+  onNicknameChange: (value: string) => void;
   onToggleSfx: () => void;
   onToggleMusic: () => void;
   onResetProgress: () => void;
@@ -107,6 +109,8 @@ interface SettingsModalProps {
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   sfxEnabled,
   musicEnabled,
+  nickname,
+  onNicknameChange,
   onToggleSfx,
   onToggleMusic,
   onResetProgress,
@@ -129,6 +133,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         <div className="flex flex-col gap-3 py-4">
+          <label className="flex flex-col gap-1.5 rounded-2xl border border-sky-500/30 bg-slate-800/80 p-3">
+            <span className="text-xs font-bold uppercase tracking-wide text-sky-200">Player nickname</span>
+            <input value={nickname} onChange={(event) => onNicknameChange(event.target.value.slice(0, 14))} maxLength={14} placeholder="Enter your nickname" className="w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-2 text-sm font-bold text-white outline-none focus:border-sky-400" />
+            <span className="text-[10px] text-slate-400">Up to 14 characters · shown above your character in multiplayer modes</span>
+          </label>
           {/* Sound FX Toggle */}
           <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-800/80 border border-slate-700">
             <div className="flex items-center gap-2.5 text-white font-bold text-sm">
@@ -203,6 +212,47 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+};
+
+
+export const CharacterCustomizeModal: React.FC<{
+  color: string;
+  onColorChange: (color: string) => void;
+  onClose: () => void;
+}> = ({ color, onColorChange, onClose }) => {
+  const colors = [
+    { value: '#0284c7', label: 'Ocean Blue' },
+    { value: '#ef4444', label: 'Berry Red' },
+    { value: '#a855f7', label: 'Mystic Purple' },
+    { value: '#eab308', label: 'Golden' },
+    { value: '#10b981', label: 'Mint' },
+  ];
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-xs">
+      <div className="w-full max-w-sm rounded-3xl border-2 border-violet-400/40 bg-slate-900 p-5 shadow-2xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-black uppercase tracking-wide text-white">Customize Kodo</h2>
+          <button onClick={onClose} aria-label="Close" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-300">×</button>
+        </div>
+        <div className="mb-4 flex flex-col items-center rounded-2xl border border-slate-700 bg-gradient-to-b from-sky-950 to-slate-950 p-5">
+          <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/20 shadow-xl" style={{ background: "radial-gradient(circle at 35% 30%, #ffffff, " + color + " 48%, #0f172a)" }}>
+            <span className="text-5xl drop-shadow-lg">🐦</span>
+          </div>
+          <span className="text-sm font-black text-white">Your Kodo</span>
+          <span className="text-[10px] text-slate-400">More outfits and accessories coming soon</span>
+        </div>
+        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-sky-200">Body color</p>
+        <div className="grid grid-cols-5 gap-2">
+          {colors.map(option => (
+            <button key={option.value} onClick={() => onColorChange(option.value)} aria-label={option.label} title={option.label} className={"flex aspect-square items-center justify-center rounded-xl border-2 " + (color === option.value ? "border-white ring-2 ring-sky-400" : "border-slate-600")} style={{ backgroundColor: option.value }}>
+              {color === option.value && <span className="text-lg font-black text-white">✓</span>}
+            </button>
+          ))}
+        </div>
+        <button onClick={onClose} className="mt-5 w-full rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 py-3 text-sm font-black uppercase text-white">Save appearance</button>
       </div>
     </div>
   );
