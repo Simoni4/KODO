@@ -380,6 +380,7 @@ export default function App() {
                 <CampaignView
                   key={`campaign-${currentLevel.id}-${restartKey}`}
                   level={currentLevel}
+                  playerColor={playerColor}
                   isPaused={screen !== 'playing' || countdown !== null || showSettings || showLevelSelect || showModeSelect}
                   onWin={handleWin}
                   onLose={handleLose}
