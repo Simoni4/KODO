@@ -352,7 +352,9 @@ export default function App() {
                   ? `Moves: ${movesCount}`
                   : mode === 'race'
                   ? 'Speed'
-                  : mode === 'survival'\n                  ? 'Shrinking'\n                  : 'Eat rivals'
+                  : mode === 'survival'
+                  ? 'Shrinking'
+                  : 'Eat rivals'
               }
             />
 
