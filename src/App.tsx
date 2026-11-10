@@ -391,10 +391,10 @@ export default function App() {
 
       {/* Ready countdown shown above every game mode */}
       {screen === 'playing' && countdown !== null && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
-          <div className="flex flex-col items-center justify-center rounded-3xl border border-sky-200/40 bg-slate-950/75 px-10 py-7 shadow-2xl backdrop-blur-md">
-            <span className="text-xs font-black uppercase tracking-[0.35em] text-sky-200">Get Ready</span>
-            <span key={countdown} className="mt-1 text-7xl font-black tabular-nums text-white drop-shadow-[0_0_24px_rgba(56,189,248,0.8)] animate-pulse">
+        <div className="absolute inset-x-0 top-5 z-40 flex justify-center pointer-events-none">
+          <div className="flex flex-col items-center justify-center">
+            <span className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-100/90 drop-shadow-[0_2px_5px_rgba(15,23,42,0.9)]">Get Ready</span>
+            <span key={countdown} className="mt-0.5 text-4xl font-black tabular-nums leading-none text-white drop-shadow-[0_2px_10px_rgba(14,165,233,0.9)] animate-pulse">
               {countdown === 0 ? 'GO!' : countdown}
             </span>
           </div>
