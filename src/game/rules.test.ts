@@ -301,35 +301,6 @@ test('AI Race uses a longer 18x18 symmetric arena with equal legal routes', () =
   }
 });
 
-test('AI Race uses a longer 18x18 symmetric arena with equal legal routes', () => {
-  for (let run = 0; run < 10; run++) {
-    const arena = generateFairRaceArena(18);
-    assert.equal(arena.size, 18);
-    assert.deepEqual(arena.finish, { x: 8, y: 8 });
-    assert.deepEqual(arena.spawns, [
-      { x: 1, y: 15 },
-      { x: 15, y: 15 },
-      { x: 15, y: 1 },
-      { x: 1, y: 1 },
-    ]);
-    assert.ok(isRaceArenaFair(arena));
-
-    const isWalkable = (x: number, y: number) =>
-      x >= 0 && x < arena.size && y >= 0 && y < arena.size && arena.grid[y][x] > 0;
-    const canStep = (fromX: number, fromY: number, toX: number, toY: number) =>
-      isWalkable(fromX, fromY) &&
-      isWalkable(toX, toY) &&
-      Math.abs(arena.grid[fromY][fromX] - arena.grid[toY][toX]) <= 1;
-
-    const routes = arena.spawns.map((spawn) =>
-      bfsShortestPath(spawn, arena.finish, isWalkable, arena.size, arena.size, canStep)
-    );
-    const routeLengths = routes.map((route) => route?.length ?? -1);
-    assert.ok(routeLengths[0] >= 14, `Race route should be longer than the original 10-step run: ${routeLengths[0]}`);
-    assert.ok(routeLengths.every((length) => length === routeLengths[0]));
-  }
-});
-
 test('Procedural Survival Arena generates 14x14 4-fold symmetric 3D board with safe symmetric spawns', () => {
   for (let run = 0; run < 10; run++) {
     const { tiles, players } = initSurvivalArena(14);
