@@ -36,6 +36,7 @@ export const ArenaView: React.FC<ArenaViewProps> = ({ isPaused = false, onComple
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rendererRef = useRef(new IsometricRenderer());
   const [players, setPlayers] = useState<SurvivalEntity[]>(createContestants);
+  const [playerPlace, setPlayerPlace] = useState<number | null>(null);
   const playersRef = useRef(players);
   const [tiles] = useState<Map<string, SurvivalTileState>>(() => {
     const map = new Map<string, SurvivalTileState>();
@@ -62,7 +63,7 @@ export const ArenaView: React.FC<ArenaViewProps> = ({ isPaused = false, onComple
     const aliveBefore = current.filter(p => p.alive).length;
     const place = aliveBefore;
     placementsRef.current.push({ id: entity.id, name: entity.name, color: entity.color, place });
-    if (entity.isPlayer) onPlayerEliminated?.(place);
+    if (entity.isPlayer) { setPlayerPlace(place); onPlayerEliminated?.(place); }
     return current.map(p => p.id === entity.id ? { ...p, alive: false } : p);
   }, [onPlayerEliminated]);
 
@@ -203,6 +204,7 @@ export const ArenaView: React.FC<ArenaViewProps> = ({ isPaused = false, onComple
   }, []);
 
   return <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+    {playerPlace !== null && <div className="absolute top-20 z-20 rounded-2xl border border-rose-300/40 bg-slate-950/85 px-4 py-2 text-center shadow-xl pointer-events-none"><div className="text-xs font-bold uppercase tracking-wider text-rose-200">You were eaten</div><div className="text-xl font-black text-white">{playerPlace}{playerPlace === 1 ? 'st' : playerPlace === 2 ? 'nd' : playerPlace === 3 ? 'rd' : 'th'} place</div><div className="text-[10px] text-slate-300">Watching the final duel…</div></div>}
     <canvas ref={canvasRef} width={720} height={860} onPointerDown={handlePointerDown} className="w-full h-full max-w-lg object-contain cursor-pointer select-none touch-none" />
   </div>;
 };
