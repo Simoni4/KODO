@@ -79,6 +79,47 @@ class AudioManager {
     osc.stop(t + 0.18);
   }
 
+  // Short, clear countdown tick.
+  public playCountdownTick() {
+    if (!this.sfxEnabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(660, t);
+    osc.frequency.exponentialRampToValueAtTime(520, t + 0.09);
+    gain.gain.setValueAtTime(0.22, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.13);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.13);
+  }
+
+  // Brighter two-tone signal when the round begins.
+  public playRaceStart() {
+    if (!this.sfxEnabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    [880, 1174.66].forEach((frequency, index) => {
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+      const start = t + index * 0.085;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(0.001, start);
+      gain.gain.linearRampToValueAtTime(0.24, start + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.32);
+      osc.connect(gain);
+      gain.connect(this.ctx!.destination);
+      osc.start(start);
+      osc.stop(start + 0.33);
+    });
+  }
+
   // Crate push: wooden scrape and low thud
   public playPush() {
     if (!this.sfxEnabled) return;
