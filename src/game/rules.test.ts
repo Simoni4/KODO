@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { bfsShortestPath } from './pathfinding';
-import { generateFairRaceArena } from './raceGenerator';
+import { generateFairRaceArena, isRaceArenaFair } from './raceGenerator';
 import { canPushCrate, resolvePushDestination, getDirectionDelta } from './puzzleLogic';
 import { initSurvivalArena, processPush } from './survivalEngine';
 import { CAMPAIGN_LEVELS } from './campaignLevels';
@@ -223,6 +223,7 @@ test('Procedural Fair Race Arena generates 14x14 4-fold symmetric 3D board with 
     assert.equal(arena.size, 14);
     assert.deepEqual(arena.finish, { x: 6, y: 6 });
     assert.equal(arena.spawns.length, 4);
+    assert.ok(isRaceArenaFair(arena), 'Arena must pass legal-route and equal-shortest-route validation');
 
     // Check 4-fold rotational symmetry around center (6,6) -> maxSym = 12
     const maxSym = 12;
@@ -312,4 +313,25 @@ test('Crate pushing and Survival push physics work accurately', () => {
   const resultEdge = processPush({ x: 12, y: 5 }, { x: 13, y: 5 }, 1, 0, walkCheck);
   assert.deepEqual(resultEdge.pushedTo, { x: 14, y: 5 });
   assert.equal(resultEdge.fell, true);
+});
+
+
+test('BFS rejects unreachable or non-walkable targets instead of routing through void', () => {
+  const grid = [
+    [1, 0],
+    [0, 3],
+  ];
+  const isWalkable = (x: number, y: number) =>
+    y >= 0 && y < grid.length && x >= 0 && x < grid[0].length && grid[y][x] > 0;
+  const canTraverse = (fromX: number, fromY: number, toX: number, toY: number) =>
+    Math.abs(grid[toY][toX] - grid[fromY][fromX]) <= 1;
+
+  assert.equal(
+    bfsShortestPath({ x: 0, y: 0 }, { x: 1, y: 1 }, isWalkable, 2, 2, canTraverse),
+    null
+  );
+  assert.equal(
+    bfsShortestPath({ x: 0, y: 0 }, { x: 1, y: 0 }, isWalkable, 2, 2),
+    null
+  );
 });
