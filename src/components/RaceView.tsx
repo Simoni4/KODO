@@ -526,13 +526,6 @@ export const RaceView: React.FC<RaceViewProps> = ({
       const targetElev = targetVal > 0 ? targetVal - 1 : playerElev;
       const elevDiff = targetElev - playerElev;
 
-      drawables.push({
-        sortKey: (curPlayerPos.x + curPlayerPos.y) * 10 + 5,
-        draw: () => {
-          renderer.drawDirectionalIndicator(ctx, playerScreen, activeDir, animTime, elevDiff);
-        },
-      });
-
       // 5. 100% Transparent Vector Kodo Bird
       drawables.push({
         sortKey: (curPlayerPos.x + curPlayerPos.y) * 10 + 6,
@@ -573,6 +566,10 @@ export const RaceView: React.FC<RaceViewProps> = ({
 
       drawables.sort((a, b) => a.sortKey - b.sortKey);
       for (const d of drawables) d.draw();
+
+      // Draw the direction cue in a final overlay pass so tall foreground blocks
+      // and characters can never obscure the player's next move.
+      renderer.drawDirectionalIndicator(ctx, playerScreen, activeDir, animTime, elevDiff);
 
       renderer.renderParticles(ctx);
 
