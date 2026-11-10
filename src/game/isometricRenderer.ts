@@ -59,8 +59,8 @@ export class IsometricRenderer {
     const heightFit = (canvasHeight - 150) * 2 / verticalSteps;
     this.tileW = Math.max(28, Math.min(preferredTileW, widthFit, heightFit));
     this.tileH = this.tileW * 0.5;
-    this.blockDepth = this.tileW * 0.3125;
-    this.elevationStep = this.tileW * 0.3125;
+    this.blockDepth = this.tileW * 0.40;
+    this.elevationStep = this.tileW * 0.35;
 
     const centerCol = (cols - 1) / 2;
     const centerRow = (rows - 1) / 2;
