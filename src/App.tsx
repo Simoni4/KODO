@@ -12,7 +12,8 @@ import { HUD } from './components/HUD';
 import { CampaignView } from './components/CampaignView';
 import { RaceView } from './components/RaceView';
 import { SurvivalView } from './components/SurvivalView';
-import { ArenaView, ArenaResultsModal, ArenaPlacement } from './components/ArenaView';
+import { ArenaView, ArenaResultsModal } from './components/ArenaView';
+import type { ArenaPlacement } from './components/ArenaView';
 import { ModeSelectModal } from './components/ModeSelectModal';
 import {
   LevelSelectModal,
@@ -351,7 +352,7 @@ export default function App() {
                   ? `Moves: ${movesCount}`
                   : mode === 'race'
                   ? 'Speed'
-                   : mode === 'survival' ? 'Shrinking' : 'Eat rivals'
+                  : mode === 'survival'\n                  ? 'Shrinking'\n                  : 'Eat rivals'
               }
             />
 
