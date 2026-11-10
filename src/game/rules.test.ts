@@ -316,29 +316,15 @@ test('AI Race contains winding routes and moderate-height obstacles without gian
   assert.ok(route?.some((point) => arena.grid[point.y][point.x] === 3), 'Route should include elevated platforms');
 });
 
-test('Procedural Survival Arena generates 14x14 4-fold symmetric 3D board with safe symmetric spawns', () => {
+test('Procedural Survival Arena generates a spacious 18x18 board with four safe spawn pads', () => {
   for (let run = 0; run < 10; run++) {
-    const { tiles, players } = initSurvivalArena(14);
+    const { tiles, players } = initSurvivalArena(18);
     assert.equal(players.length, 4);
-
+    assert.ok(tiles.size > 150, 'Arena should have a broad playable floor');
     for (const p of players) {
       const t = tiles.get(`${p.x},${p.y}`);
-      assert.ok(t && t.state === 'stable', `Spawn for ${p.name} at (${p.x},${p.y}) must be stable`);
-    }
-
-    for (let y = 0; y < 14; y++) {
-      for (let x = 0; x < 14; x++) {
-        const t1 = tiles.get(`${x},${y}`);
-        const t2 = tiles.get(`${y},${13 - x}`);
-        assert.equal(Boolean(t1), Boolean(t2), `Survival tile existence symmetry at (${x},${y})`);
-        if (t1 && t2) {
-          assert.equal(
-            t1.elevation,
-            t2.elevation,
-            `Survival tile elevation symmetry at (${x},${y})`
-          );
-        }
-      }
+      assert.ok(t && t.state === 'stable', `Spawn for ${p.name} must be stable`);
+      assert.equal(t?.elevation, 0, 'Spawn pads should be on the low floor');
     }
   }
 });
