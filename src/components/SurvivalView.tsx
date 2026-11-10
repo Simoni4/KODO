@@ -565,7 +565,7 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
       active = false;
       cancelAnimationFrame(animId);
     };
-  }, [getTileElevationSync]);
+  }, [getTileElevationSync, playerName, playerColor]);
 
   return (
     <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
