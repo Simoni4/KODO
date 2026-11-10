@@ -536,19 +536,6 @@ export const CampaignView: React.FC<CampaignViewProps> = ({
         : getElevation(pPos.x, pPos.y);
       const elevDiff = nextTileElev - getElevation(pPos.x, pPos.y);
 
-      drawables.push({
-        sortKey: (curX + curY) * 10 + 5,
-        draw: () => {
-          renderer.drawDirectionalIndicator(
-            ctx,
-            renderer.gridToIso(pPos.x, pPos.y, originX, originY, getElevation(pPos.x, pPos.y)),
-            activeDir,
-            animTime,
-            elevDiff
-          );
-        },
-      });
-
       // 8. 100% Transparent Vector Kodo Bird with 3D jump arc
       const jumpArc = isMidHop ? Math.sin(jumpProg * Math.PI) * 26 : 0;
 
@@ -583,6 +570,15 @@ export const CampaignView: React.FC<CampaignViewProps> = ({
 
       drawables.sort((a, b) => a.sortKey - b.sortKey);
       for (const d of drawables) d.draw();
+
+      // Keep the next-move indicator in a top overlay pass above tall terrain and actors.
+      renderer.drawDirectionalIndicator(
+        ctx,
+        renderer.gridToIso(pPos.x, pPos.y, originX, originY, getElevation(pPos.x, pPos.y)),
+        activeDir,
+        animTime,
+        elevDiff
+      );
 
       renderer.renderParticles(ctx);
 
