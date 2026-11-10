@@ -140,15 +140,34 @@ export const RaceView: React.FC<RaceViewProps> = ({
 
       KodoAudioManager.playHop();
 
+      const botOnTarget = botsRef.current.find(
+        (b) => b.alive && b.x === targetX && b.y === targetY
+      );
+      if (botOnTarget) {
+        const pushedX = botOnTarget.x + dx;
+        const pushedY = botOnTarget.y + dy;
+        const destinationOccupied = botsRef.current.some(
+          (other) =>
+            other.alive &&
+            other.id !== botOnTarget.id &&
+            other.x === pushedX &&
+            other.y === pushedY
+        );
+
+        // Do not teleport a blocked bot into the player's previous tile or stack racers.
+        if (
+          !canStepBetweenSync(botOnTarget.x, botOnTarget.y, pushedX, pushedY) ||
+          destinationOccupied
+        ) {
+          return;
+        }
+      }
+
       const nextBots = botsRef.current.map((b) => {
-        if (b.x === targetX && b.y === targetY) {
+        if (b.alive && b.x === targetX && b.y === targetY) {
           const pushedX = b.x + dx;
           const pushedY = b.y + dy;
           KodoAudioManager.playPush();
-
-          if (!canStepBetweenSync(b.x, b.y, pushedX, pushedY)) {
-            return { ...b, x: curPos.x, y: curPos.y };
-          }
           return { ...b, x: pushedX, y: pushedY };
         }
         return b;
@@ -251,22 +270,30 @@ export const RaceView: React.FC<RaceViewProps> = ({
               return bot;
             }
 
+            const anotherBotOnStep = prevBots.some(
+              (other) =>
+                other.alive &&
+                other.id !== bot.id &&
+                other.x === nextStep.x &&
+                other.y === nextStep.y
+            );
+            if (anotherBotOnStep) return bot;
+
             if (nextStep.x === curPlayer.x && nextStep.y === curPlayer.y) {
               const pushDx = nextStep.x - bot.x;
               const pushDy = nextStep.y - bot.y;
               const pushedPX = curPlayer.x + pushDx;
               const pushedPY = curPlayer.y + pushDy;
 
-              KodoAudioManager.playPush();
-              if (canStepBetweenSync(curPlayer.x, curPlayer.y, pushedPX, pushedPY)) {
-                const pNext = { x: pushedPX, y: pushedPY };
-                playerPosRef.current = pNext;
-                setPlayerPos(pNext);
-              } else {
-                const pSwap = { x: bot.x, y: bot.y };
-                playerPosRef.current = pSwap;
-                setPlayerPos(pSwap);
+              // If the player cannot legally be pushed, the bot waits instead of swapping positions.
+              if (!canStepBetweenSync(curPlayer.x, curPlayer.y, pushedPX, pushedPY)) {
+                return bot;
               }
+
+              KodoAudioManager.playPush();
+              const pNext = { x: pushedPX, y: pushedPY };
+              playerPosRef.current = pNext;
+              setPlayerPos(pNext);
             }
 
             return { ...bot, x: nextStep.x, y: nextStep.y };
