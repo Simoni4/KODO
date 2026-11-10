@@ -120,6 +120,21 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
         return;
       }
 
+      const botOnTarget = currentPlayers.find(
+        (p) => !p.isPlayer && p.alive && p.x === targetX && p.y === targetY
+      );
+      if (botOnTarget) {
+        const shovedX = botOnTarget.x + dx;
+        const shovedY = botOnTarget.y + dy;
+        // A bot cannot be pushed onto a walkable platform that is more than one level away.
+        if (
+          isCellStandingSync(shovedX, shovedY) &&
+          Math.abs(getTileElevationSync(shovedX, shovedY) - targetElev) > 1
+        ) {
+          return;
+        }
+      }
+
       const updatedPlayers = currentPlayers.map((p) => {
         if (!p.isPlayer && p.alive && p.x === targetX && p.y === targetY) {
           const shovedX = p.x + dx;
@@ -296,12 +311,25 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
             const pNextX = nextPlayers[playerIdx].x + pPushDx;
             const pNextY = nextPlayers[playerIdx].y + pPushDy;
 
+            const player = nextPlayers[playerIdx];
+            const pushTargetIsWalkable = isCellStandingSync(pNextX, pNextY);
+            const pushHeightIsReachable =
+              Math.abs(
+                getTileElevationSync(pNextX, pNextY) -
+                getTileElevationSync(player.x, player.y)
+              ) <= 1;
+
+            // A bot may knock Kodo into the abyss, but cannot teleport it across a tall cliff.
+            if (pushTargetIsWalkable && !pushHeightIsReachable) {
+              continue;
+            }
+
             KodoAudioManager.playPush();
             nextPlayers[playerIdx] = {
-              ...nextPlayers[playerIdx],
+              ...player,
               x: pNextX,
               y: pNextY,
-              alive: isCellStandingSync(pNextX, pNextY),
+              alive: pushTargetIsWalkable,
             };
           }
 
