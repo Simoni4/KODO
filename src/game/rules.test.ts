@@ -316,11 +316,11 @@ test('AI Race contains winding routes and moderate-height obstacles without gian
   assert.ok(route?.some((point) => arena.grid[point.y][point.x] === 2), 'Route should include elevated platforms');
 });
 
-test('Procedural Survival Arena generates a spacious 18x18 board with four safe spawn pads', () => {
+test('Procedural Survival Arena generates a spacious 22x22 board with four safe spawn pads', () => {
   for (let run = 0; run < 10; run++) {
     const { tiles, players } = initSurvivalArena(22);
     assert.equal(players.length, 4);
-    assert.ok(tiles.size > 400, 'Arena should have a very broad open playable floor');
+    assert.ok(tiles.size > 450, 'Arena should have a very broad open playable floor');
     for (const p of players) {
       const t = tiles.get(`${p.x},${p.y}`);
       assert.ok(t && t.state === 'stable', `Spawn for ${p.name} must be stable`);
@@ -329,14 +329,14 @@ test('Procedural Survival Arena generates a spacious 18x18 board with four safe 
   }
 });
 
-test('Survival arena has a low open-front enclosure and safe inner spawn pads', () => {
-  const { tiles, players } = initSurvivalArena(18);
+test('Survival arena is fully open with low scattered platforms and safe spawn pads', () => {
+  const { tiles, players } = initSurvivalArena(22);
   for (const player of players) {
     const spawn = tiles.get(`${player.x},${player.y}`);
     assert.ok(spawn && spawn.state === 'stable');
     assert.equal(spawn?.elevation, 0);
   }
-  assert.equal(tiles.size > 400, true, 'No perimeter should be removed from the open floor');
+  assert.equal(tiles.size > 450, true, 'No perimeter should be removed from the open floor');
   assert.ok(Array.from(tiles.values()).every((tile) => tile.elevation <= 2), 'No high enclosing walls');
   assert.ok(Array.from(tiles.values()).some((tile) => tile.elevation === 1));
 });
@@ -352,8 +352,8 @@ test('Crate pushing and Survival push physics work accurately', () => {
   assert.deepEqual(resultSafe.pushedTo, { x: 7, y: 5 });
   assert.equal(resultSafe.fell, false);
 
-  const resultEdge = processPush({ x: 12, y: 5 }, { x: 13, y: 5 }, 1, 0, walkCheck);
-  assert.deepEqual(resultEdge.pushedTo, { x: 14, y: 5 });
+  const resultEdge = processPush({ x: 20, y: 5 }, { x: 21, y: 5 }, 1, 0, walkCheck);
+  assert.deepEqual(resultEdge.pushedTo, { x: 22, y: 5 });
   assert.equal(resultEdge.fell, true);
 });
 
