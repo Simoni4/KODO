@@ -8,11 +8,18 @@ export function bfsShortestPath(
   height: number,
   canTraverse?: (fromX: number, fromY: number, toX: number, toY: number) => boolean
 ): Point[] | null {
+  const inBounds = (p: Point) =>
+    p.x >= 0 && p.x < width && p.y >= 0 && p.y < height;
+
+  if (!inBounds(start) || !inBounds(target) || !isWalkable(start.x, start.y) || !isWalkable(target.x, target.y)) {
+    return null;
+  }
   if (start.x === target.x && start.y === target.y) {
     return [];
   }
 
   const queue: Point[] = [start];
+  let head = 0;
   const visited = new Set<string>();
   const parent = new Map<string, Point | null>();
 
@@ -29,8 +36,8 @@ export function bfsShortestPath(
 
   let reached = false;
 
-  while (queue.length > 0) {
-    const current = queue.shift()!;
+  while (head < queue.length) {
+    const current = queue[head++];
     if (current.x === target.x && current.y === target.y) {
       reached = true;
       break;
@@ -49,8 +56,8 @@ export function bfsShortestPath(
         ny < height &&
         !visited.has(nextKey)
       ) {
-        // Can walk if isWalkable is true or if it is the target itself
-        const destinationIsWalkable = isWalkable(nx, ny) || (nx === target.x && ny === target.y);
+        // Every traversed cell, including the target, must be a real walkable tile.
+        const destinationIsWalkable = isWalkable(nx, ny);
         const movementIsValid = canTraverse
           ? canTraverse(current.x, current.y, nx, ny)
           : true;
