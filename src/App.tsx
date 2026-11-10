@@ -83,6 +83,7 @@ export default function App() {
 
   // Runtime metrics
   const [restartKey, setRestartKey] = useState<number>(0);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const [timerSeconds, setTimerSeconds] = useState<number>(0);
   const [movesCount, setMovesCount] = useState<number>(0);
   const [raceRank, setRaceRank] = useState<number>(1);
@@ -106,9 +107,19 @@ export default function App() {
     }
   }, []);
 
-  // Timer loop when playing
+  // Three-second ready countdown before every new round or restart.
   useEffect(() => {
-    if (screen === 'playing') {
+    if (screen !== 'playing' || countdown === null) return;
+    const delay = countdown === 0 ? 650 : 1000;
+    const timeout = window.setTimeout(() => {
+      setCountdown((value) => value === null ? null : value === 0 ? null : value - 1);
+    }, delay);
+    return () => window.clearTimeout(timeout);
+  }, [screen, countdown]);
+
+  // Timer loop starts only after the countdown has finished.
+  useEffect(() => {
+    if (screen === 'playing' && countdown === null) {
       timerIntervalRef.current = setInterval(() => {
         setTimerSeconds((prev) => prev + 1);
       }, 1000);
@@ -121,7 +132,7 @@ export default function App() {
     return () => {
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
     };
-  }, [screen]);
+  }, [screen, countdown]);
 
   // Format timer seconds into 0:00:00
   const formatTimer = (sec: number) => {
@@ -139,6 +150,7 @@ export default function App() {
       randomizeGameplayTheme();
       setShowModeSelect(false);
       setScreen('playing');
+      setCountdown(3);
       setTimerSeconds(0);
       setMovesCount(0);
       setShowVictory(false);
@@ -179,6 +191,7 @@ export default function App() {
     setShowVictory(false);
     setShowDefeat(false);
     setScreen('playing');
+    setCountdown(3);
     KodoAudioManager.playHop();
   };
 
@@ -268,6 +281,7 @@ export default function App() {
   // Return to Main Menu cleanly from any modal
   const handleMainMenu = () => {
     screenRef.current = 'title';
+    setCountdown(null);
     setShowVictory(false);
     setShowDefeat(false);
     setShowModeSelect(false);
@@ -356,7 +370,7 @@ export default function App() {
                 <CampaignView
                   key={`campaign-${currentLevel.id}-${restartKey}`}
                   level={currentLevel}
-                  isPaused={screen !== 'playing' || showSettings || showLevelSelect || showModeSelect}
+                  isPaused={screen !== 'playing' || countdown !== null || showSettings || showLevelSelect || showModeSelect}
                   onWin={handleWin}
                   onLose={handleLose}
                   onMovesChange={setMovesCount}
@@ -365,7 +379,7 @@ export default function App() {
               {mode === 'race' && (
                 <RaceView
                   key={`race-${restartKey}`}
-                  isPaused={screen !== 'playing' || showSettings || showLevelSelect || showModeSelect}
+                  isPaused={screen !== 'playing' || countdown !== null || showSettings || showLevelSelect || showModeSelect}
                   onWin={(place, _moves, winnerName) => {
                     if (place === 1) {
                       handleWin(3, 0, timerSeconds);
@@ -379,7 +393,7 @@ export default function App() {
               {mode === 'survival' && (
                 <SurvivalView
                   key={`survival-${restartKey}`}
-                  isPaused={screen !== 'playing' || showSettings || showLevelSelect || showModeSelect}
+                  isPaused={screen !== 'playing' || countdown !== null || showSettings || showLevelSelect || showModeSelect}
                   onWin={(survivedSec) => handleWin(3, 0, survivedSec)}
                   onLose={handleLose}
                   onAliveCountChange={setSurvivalAlive}
@@ -388,6 +402,18 @@ export default function App() {
             </div>
           </div>
         )}
+
+      {/* Ready countdown shown above every game mode */}
+      {screen === 'playing' && countdown !== null && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-sky-200/40 bg-slate-950/75 px-10 py-7 shadow-2xl backdrop-blur-md">
+            <span className="text-xs font-black uppercase tracking-[0.35em] text-sky-200">Get Ready</span>
+            <span key={countdown} className="mt-1 text-7xl font-black tabular-nums text-white drop-shadow-[0_0_24px_rgba(56,189,248,0.8)] animate-pulse">
+              {countdown === 0 ? 'GO!' : countdown}
+            </span>
+          </div>
+        </div>
+      )}
 
         {/* MODE SELECT MODAL (Triggered when clicking Play on Title Screen) */}
         {showModeSelect && (
@@ -411,6 +437,7 @@ export default function App() {
             levelStars={levelStars}
             bestTimes={bestTimes}
             onSelectLevel={(idx) => {
+              if (idx > unlockedLevel) return;
               setCurrentLevelIndex(idx);
               setMode('campaign');
               setScreen('playing');
@@ -471,7 +498,6 @@ export default function App() {
             reason={defeatReason}
             attemptCount={failCounts[currentLevel.id] || 1}
             onRetry={handleRestart}
-            onSkip={mode === 'campaign' ? handleSkipLevel : undefined}
             onMainMenu={handleMainMenu}
           />
         )}
