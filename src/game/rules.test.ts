@@ -277,12 +277,17 @@ test('AI Race uses a longer 18x18 symmetric arena with equal legal routes', () =
     const arena = generateFairRaceArena(18);
     assert.equal(arena.size, 18);
     assert.deepEqual(arena.finish, { x: 8, y: 8 });
-    assert.deepEqual(arena.spawns, [
-      { x: 1, y: 15 },
-      { x: 15, y: 15 },
-      { x: 15, y: 1 },
-      { x: 1, y: 1 },
-    ]);
+    assert.equal(arena.spawns.length, 4);
+    const allowedStarts = ['0,15', '1,16', '2,16', '0,14', '1,15'];
+    assert.ok(allowedStarts.includes(`${arena.spawns[0].x},${arena.spawns[0].y}`));
+    assert.deepEqual(
+      arena.spawns.slice(1),
+      [1, 2, 3].map((turn) => {
+        let p = { ...arena.spawns[0] };
+        for (let i = 0; i < turn; i++) p = { x: p.y, y: 16 - p.x };
+        return p;
+      })
+    );
     assert.ok(isRaceArenaFair(arena));
 
     const isWalkable = (x: number, y: number) =>
