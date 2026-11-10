@@ -95,6 +95,20 @@ function generateRaceArenaCandidate(size: number = 14): RaceArena {
     setSymmetric(5, 8, 2);
   }
 
+  // Add small symmetric terrain variations. The validator below rejects any
+  // candidate that makes the four legal shortest routes unequal or unreachable.
+  const featureCandidates: [number, number][] = [
+    [3, 3], [3, 4], [4, 3], [4, 4],
+    [3, 5], [5, 3], [4, 5], [5, 4],
+  ];
+  for (let i = 0; i < 2; i++) {
+    const featureIndex = Math.floor(Math.random() * featureCandidates.length);
+    const [featureX, featureY] = featureCandidates.splice(featureIndex, 1)[0];
+    const roll = Math.random();
+    const featureHeight = roll < 0.18 ? 0 : roll < 0.62 ? 1 : 2;
+    setSymmetric(featureX, featureY, featureHeight);
+  }
+
   // 3. Center Podium Platform (3x3 at 5..7, 5..7)
   // Outer rim of podium is height 1 (val=2) and exact center finish is height 2 (val=3, +2 blocks up!)
   for (let dy = -1; dy <= 1; dy++) {
