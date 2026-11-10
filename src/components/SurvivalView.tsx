@@ -20,7 +20,7 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rendererRef = useRef<IsometricRenderer>(new IsometricRenderer());
 
-  const arenaSize = 18;
+  const arenaSize = 22;
   const initialArenaRef = useRef(initSurvivalArena(arenaSize));
   const [tiles, setTiles] = useState<Map<string, SurvivalTileState>>(
     () => initialArenaRef.current.tiles
@@ -233,8 +233,7 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
         const stableKeys = Array.from(next.keys()).filter((k) => {
           const tile = next.get(k);
           // Keep the tall perimeter fence intact; only the playable arena floor crumbles.
-          return tile?.state === 'stable' && (tile.elevation || 0) < 2 &&
-            !(tile.x === 2 || tile.x === arenaSize - 3 || tile.y === 2);
+          return tile?.state === 'stable' && (tile.elevation || 0) < 3;
         });
         if (stableKeys.length > 4) {
           for (let i = 0; i < 2; i++) {
