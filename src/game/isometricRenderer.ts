@@ -631,7 +631,7 @@ export class IsometricRenderer {
     ctx.restore();
   }
 
-  // Draw 100% transparent vector Kodo the Blue Bird (ZERO black pixels, fully animated!)
+  // Low-poly Kodo: faceted geometry, layered feathers and a winter scarf.
   public drawKodoBird(
     ctx: CanvasRenderingContext2D,
     x: number,
@@ -642,179 +642,128 @@ export class IsometricRenderer {
     animTime: number,
     customColor?: string
   ) {
-    const idleBob = !isJumping ? Math.sin(animTime * 3.5) * 2.5 : 0;
-    const wingFlap = isJumping ? Math.sin(animTime * 25) * 16 : Math.sin(animTime * 3.5) * 3;
-    const isBlink = Math.sin(animTime * 0.8) > 0.94;
+    const palettes: Record<string, [string, string, string, string, string]> = {
+      '#ef4444': ['#fecaca', '#ef4444', '#991b1b', '#f87171', '#fca5a5'],
+      '#a855f7': ['#e9d5ff', '#a855f7', '#6b21a8', '#c084fc', '#ddd6fe'],
+      '#eab308': ['#fef9c3', '#eab308', '#a16207', '#fde047', '#fef08a'],
+      '#10b981': ['#a7f3d0', '#10b981', '#065f46', '#34d399', '#6ee7b7'],
+    };
+    const [light, mid, dark, crestLight, crestPale] =
+      palettes[customColor || ''] || ['#bae6fd', '#0284c7', '#075985', '#38bdf8', '#7dd3fc'];
+
+    const jump = Math.max(0, Math.min(1, jumpArc / 58));
+    const idleBob = !isJumping ? Math.sin(animTime * 3.4) * 1.7 : 0;
+    const wingBeat = isJumping ? Math.sin(animTime * 24) : Math.sin(animTime * 3.4) * 0.12;
+    const blink = Math.sin(animTime * 0.8) > 0.94;
+    const squashX = isJumping ? 1 + jump * 0.07 : 1 + Math.max(0, Math.sin(animTime * 3.4)) * 0.012;
+    const squashY = isJumping ? 1 - jump * 0.07 : 1;
+
+    const polygon = (points: [number, number][], fill: string, stroke?: string) => {
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+      ctx.closePath();
+      ctx.fillStyle = fill;
+      ctx.fill();
+      if (stroke) {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    };
 
     ctx.save();
     ctx.translate(x, y - jumpArc + idleBob);
-    if (facing === 'left') {
-      ctx.scale(-1, 1);
-    }
+    if (facing === 'left') ctx.scale(-1, 1);
+    ctx.scale(squashX, squashY);
 
-    // Color palette resolution
-    let cLight = '#7dd3fc';
-    let cMid = '#0284c7';
-    let cDark = '#0369a1';
-    let cCrest1 = '#0ea5e9';
-    let cCrest2 = '#38bdf8';
+    // Feet and their small shadows.
+    ctx.fillStyle = '#d97706';
+    ctx.beginPath();
+    ctx.ellipse(-7, 5, 5.5, 2.3, -0.12, 0, Math.PI * 2);
+    ctx.ellipse(7, 5, 5.5, 2.3, 0.12, 0, Math.PI * 2);
+    ctx.fill();
+    polygon([[-11, 3], [-7, 1], [-4, 5], [-12, 6]], '#fbbf24');
+    polygon([[4, 5], [7, 1], [12, 3], [12, 6]], '#f59e0b');
 
-    if (customColor === '#ef4444' || customColor === '#dc2626' || customColor === '#f87171') {
-      cLight = '#fca5a5';
-      cMid = '#ef4444';
-      cDark = '#991b1b';
-      cCrest1 = '#f87171';
-      cCrest2 = '#fca5a5';
-    } else if (customColor === '#a855f7' || customColor === '#9333ea' || customColor === '#c084fc') {
-      cLight = '#d8b4fe';
-      cMid = '#a855f7';
-      cDark = '#6b21a8';
-      cCrest1 = '#c084fc';
-      cCrest2 = '#e9d5ff';
-    } else if (customColor === '#eab308' || customColor === '#f59e0b' || customColor === '#facc15') {
-      cLight = '#fef08a';
-      cMid = '#eab308';
-      cDark = '#a16207';
-      cCrest1 = '#fde047';
-      cCrest2 = '#fef9c3';
-    } else if (customColor === '#10b981' || customColor === '#059669') {
-      cLight = '#6ee7b7';
-      cMid = '#10b981';
-      cDark = '#065f46';
-      cCrest1 = '#34d399';
-      cCrest2 = '#a7f3d0';
-    }
+    // Tail feathers behind the body.
+    polygon([[-13, -15], [-25, -20], [-21, -8]], dark);
+    polygon([[-12, -12], [-24, -12], [-18, -3]], mid);
 
-    // 1. Triple Head Crest Feathers
-    ctx.fillStyle = cCrest1;
-    ctx.beginPath();
-    ctx.ellipse(0, -38, 5, 12, 0.15, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = cCrest2;
-    ctx.beginPath();
-    ctx.ellipse(-5, -36, 4, 10, -0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = cMid;
-    ctx.beginPath();
-    ctx.ellipse(5, -36, 4, 10, 0.3, 0, Math.PI * 2);
-    ctx.fill();
+    // Wings flap around their shoulders.
+    ctx.save();
+    ctx.translate(-17, -13);
+    ctx.rotate(-0.18 - wingBeat * 0.42);
+    polygon([[-1, -3], [-12, -12], [-18, -4], [-16, 7], [-7, 12], [1, 6]], dark);
+    polygon([[-5, -2], [-13, -8], [-14, -1], [-8, 6]], mid);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(17, -13);
+    ctx.rotate(0.18 + wingBeat * 0.42);
+    polygon([[1, -3], [12, -12], [18, -4], [16, 7], [7, 12], [-1, 6]], mid);
+    polygon([[5, -2], [13, -8], [14, -1], [8, 6]], light);
+    ctx.restore();
 
-    // 2. Wings
-    ctx.fillStyle = cDark;
-    // Left Wing
-    ctx.beginPath();
-    ctx.ellipse(-18, -12 + wingFlap * 0.4, 7, 13, -0.3 + wingFlap * 0.03, 0, Math.PI * 2);
-    ctx.fill();
-    // Right Wing
-    ctx.beginPath();
-    ctx.ellipse(18, -12 - wingFlap * 0.4, 7, 13, 0.3 - wingFlap * 0.03, 0, Math.PI * 2);
-    ctx.fill();
+    // Faceted round body, assembled from broad polygon planes.
+    polygon([[-18, -29], [-8, -37], [9, -36], [20, -25], [23, -8], [15, 3], [0, 8], [-15, 2], [-23, -10], [-22, -23]], dark);
+    polygon([[-18, -29], [-8, -37], [2, -34], [-1, -15], [-20, -12], [-22, -23]], mid);
+    polygon([[-8, -37], [9, -36], [20, -25], [7, -15], [-1, -15], [2, -34]], light);
+    polygon([[20, -25], [23, -8], [15, 3], [0, 8], [7, -15]], dark);
+    polygon([[-20, -12], [-1, -15], [7, -15], [15, 3], [0, 8], [-15, 2], [-23, -10]], mid);
+    polygon([[-12, -10], [-2, -15], [9, -13], [15, -2], [7, 5], [-8, 3], [-15, -3]], '#f0f9ff');
+    polygon([[-12, -10], [-2, -15], [-3, -4], [-12, -3]], '#ffffff');
+    polygon([[-3, -4], [9, -13], [15, -2], [7, 5]], '#dbeafe');
 
-    // 3. Round Bird Body
-    const bodyGrad = ctx.createRadialGradient(-4, -20, 4, 0, -16, 26);
-    bodyGrad.addColorStop(0, cLight);
-    bodyGrad.addColorStop(0.65, cMid);
-    bodyGrad.addColorStop(1, cDark);
-    ctx.fillStyle = bodyGrad;
-    ctx.beginPath();
-    ctx.arc(0, -16, 22, 0, Math.PI * 2);
-    ctx.fill();
+    // Three angular crest feathers.
+    polygon([[-10, -34], [-13, -48], [-4, -41], [-2, -32]], crestPale);
+    polygon([[-3, -35], [0, -51], [7, -39], [5, -31]], crestLight);
+    polygon([[4, -34], [13, -45], [12, -31], [7, -29]], mid);
 
-    // 4. White Belly Patch
-    const bellyGrad = ctx.createLinearGradient(0, -18, 0, 4);
-    bellyGrad.addColorStop(0, '#ffffff');
-    bellyGrad.addColorStop(1, '#e0f2fe');
-    ctx.fillStyle = bellyGrad;
-    ctx.beginPath();
-    ctx.ellipse(0, -10, 14, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
+    // Bright low-poly cheek facets.
+    polygon([[-17, -17], [-12, -20], [-10, -13], [-16, -11]], '#f9a8d4');
+    polygon([[10, -13], [12, -20], [17, -17], [16, -11]], '#f9a8d4');
 
-    // 5. Orange Feet
-    ctx.fillStyle = '#f59e0b';
-    ctx.beginPath();
-    ctx.ellipse(-7, 5, 4.5, 2.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(7, 5, 4.5, 2.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // 6. Blush Cheeks
-    ctx.fillStyle = 'rgba(244, 114, 182, 0.55)';
-    ctx.beginPath();
-    ctx.ellipse(-13, -13, 4.5, 3, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(13, -13, 4.5, 3, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // 7. Expressive Cartoon Eyes
-    if (!isBlink) {
-      // Left Eye
+    // Eyes with crisp highlights.
+    if (!blink) {
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.ellipse(-7, -22, 6, 8, 0, 0, Math.PI * 2);
+      ctx.ellipse(-7, -23, 5.8, 7.2, -0.12, 0, Math.PI * 2);
+      ctx.ellipse(7, -23, 5.8, 7.2, 0.12, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#0f172a';
+      ctx.fillStyle = '#172554';
       ctx.beginPath();
-      ctx.ellipse(-6, -22, 4, 5.5, 0, 0, Math.PI * 2);
-      ctx.fill();
-      // Double sparkle gleams
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(-5, -24, 1.8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(-7, -20, 0.9, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Right Eye
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.ellipse(7, -22, 6, 8, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath();
-      ctx.ellipse(8, -22, 4, 5.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(-6, -22, 3.5, 5, 0, 0, Math.PI * 2);
+      ctx.ellipse(8, -22, 3.5, 5, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.arc(9, -24, 1.8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(7, -20, 0.9, 0, Math.PI * 2);
+      ctx.arc(-5, -25, 1.5, 0, Math.PI * 2);
+      ctx.arc(9, -25, 1.5, 0, Math.PI * 2);
       ctx.fill();
     } else {
-      // Happy blink curved lines
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#172554';
+      ctx.lineWidth = 2.2;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.arc(-7, -20, 5, Math.PI * 1.1, Math.PI * 1.9);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(7, -20, 5, Math.PI * 1.1, Math.PI * 1.9);
+      ctx.moveTo(-11, -22); ctx.lineTo(-4, -21);
+      ctx.moveTo(4, -21); ctx.lineTo(11, -22);
       ctx.stroke();
     }
 
-    // 8. Cute Orange Beak
-    const beakGrad = ctx.createLinearGradient(0, -18, 0, -10);
-    beakGrad.addColorStop(0, '#fde047');
-    beakGrad.addColorStop(0.5, '#f59e0b');
-    beakGrad.addColorStop(1, '#d97706');
-    ctx.fillStyle = beakGrad;
-    ctx.beginPath();
-    ctx.moveTo(-6, -18);
-    ctx.lineTo(6, -18);
-    ctx.lineTo(0, -10);
-    ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle = '#b45309';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    // Small faceted orange beak.
+    polygon([[-6, -15], [0, -18], [7, -15], [1, -7]], '#f59e0b', '#b45309');
+    polygon([[-6, -15], [0, -18], [1, -7]], '#fcd34d');
+
+    // Signature winter scarf: collar, front drape and two angular tassels.
+    polygon([[-19, -8], [-13, -13], [13, -13], [20, -8], [15, -2], [-14, -2]], '#b91c1c');
+    polygon([[-19, -8], [-13, -13], [0, -10], [-2, -3], [-14, -2]], '#ef4444');
+    polygon([[1, -10], [13, -13], [20, -8], [15, -2], [1, -3]], '#dc2626');
+    polygon([[5, -4], [14, -5], [13, 10], [8, 13], [4, 9]], '#dc2626');
+    polygon([[5, -4], [9, -4], [8, 12], [4, 9]], '#f87171');
+    polygon([[-8, -4], [-2, -4], [-3, 5], [-8, 3]], '#ef4444');
 
     ctx.restore();
   }
-
   // Clockwise 4 directions on isometric grid: Up (Up-Right) -> Right (Down-Right) -> Down (Down-Left) -> Left (Up-Left)
   public static readonly CLOCKWISE_DIRECTIONS: ('up' | 'right' | 'down' | 'left')[] = [
     'up',
