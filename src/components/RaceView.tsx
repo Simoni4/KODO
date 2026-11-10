@@ -67,6 +67,7 @@ export const RaceView: React.FC<RaceViewProps> = ({
       personality: 'cautious',
       alive: true,
       score: 0,
+      nextMoveAt: performance.now() + Math.random() * 700,
     },
   ];
 
