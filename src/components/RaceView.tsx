@@ -154,9 +154,13 @@ export const RaceView: React.FC<RaceViewProps> = ({
             other.y === pushedY
         );
 
-        // Do not teleport a blocked bot into the player's previous tile or stack racers.
+        const pushedTileExists = isCellWalkableSync(pushedX, pushedY);
+
+        // A void push resets the racer to its own spawn, matching the Unity AI Race rules.
+        // A tall cliff or another racer blocks the push instead of causing a teleport.
         if (
-          !canStepBetweenSync(botOnTarget.x, botOnTarget.y, pushedX, pushedY) ||
+          (pushedTileExists &&
+            !canStepBetweenSync(botOnTarget.x, botOnTarget.y, pushedX, pushedY)) ||
           destinationOccupied
         ) {
           return;
@@ -168,6 +172,9 @@ export const RaceView: React.FC<RaceViewProps> = ({
           const pushedX = b.x + dx;
           const pushedY = b.y + dy;
           KodoAudioManager.playPush();
+          if (!isCellWalkableSync(pushedX, pushedY)) {
+            return { ...b, x: b.spawn.x, y: b.spawn.y };
+          }
           return { ...b, x: pushedX, y: pushedY };
         }
         return b;
