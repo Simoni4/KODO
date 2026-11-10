@@ -8,6 +8,7 @@ import { KodoAudioManager } from '../game/audio';
 interface CampaignViewProps {
   level: LevelData;
   isPaused?: boolean;
+  playerColor?: string;
   onWin: (stars: number, moves: number, timeSeconds: number) => void;
   onLose: (reason: string) => void;
   onMovesChange?: (moves: number) => void;
@@ -16,6 +17,7 @@ interface CampaignViewProps {
 export const CampaignView: React.FC<CampaignViewProps> = ({
   level,
   isPaused = false,
+  playerColor = '#0284c7',
   onWin,
   onLose,
   onMovesChange,
@@ -563,7 +565,8 @@ export const CampaignView: React.FC<CampaignViewProps> = ({
             facingRef.current,
             isMidHop,
             jumpArc,
-            animTime
+            animTime,
+            playerColor
           );
         },
       });
