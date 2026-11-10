@@ -257,9 +257,7 @@ export const RaceView: React.FC<RaceViewProps> = ({
         const updated = prevBots.map((bot) => {
           if (!bot.alive) return bot;
 
-          // All racers use the same movement cadence; personality must not grant a speed advantage.
-          const moveChance = 0.76;
-          if (Math.random() > moveChance) return bot;
+          // Every bot moves once per shared AI tick; personality affects route choice, never speed.
 
           // Personalities change only shortest-route tie-breaking, never movement speed.
           const directionOrder =
@@ -320,7 +318,7 @@ export const RaceView: React.FC<RaceViewProps> = ({
         botsRef.current = updated;
         return updated;
       });
-    }, 950);
+    }, 850);
 
     return () => {
       if (botTimerRef.current) clearInterval(botTimerRef.current);
