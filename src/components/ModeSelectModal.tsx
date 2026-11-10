@@ -62,20 +62,14 @@ export const ModeSelectModal: React.FC<ModeSelectModalProps> = ({
               </span>
             </div>
 
-            <div className="flex gap-2 mt-3 pt-3 border-t border-sky-800/40">
-              <button
-                onClick={() => onSelectMode('campaign')}
-                className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-extrabold text-xs uppercase shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-              >
-                <span>Play Level {currentCampaignLevel + 1}</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
+            <div className="mt-3 pt-3 border-t border-sky-800/40">
               <button
                 onClick={onOpenLevelGrid}
-                className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase border border-slate-600/80 flex items-center gap-1 transition-colors cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-extrabold text-xs uppercase shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
-                <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                <span>Grid</span>
+                <Trophy className="w-4 h-4 text-amber-200" />
+                <span>Choose Campaign Level · {unlockedLevel + 1}/{totalLevels} unlocked</span>
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
