@@ -18,6 +18,7 @@ import { ModeSelectModal } from './components/ModeSelectModal';
 import {
   LevelSelectModal,
   SettingsModal,
+  CharacterCustomizeModal,
   VictoryModal,
   DefeatModal,
   PauseModal,
@@ -75,6 +76,7 @@ export default function App() {
   const [showModeSelect, setShowModeSelect] = useState<boolean>(false);
   const [showLevelSelect, setShowLevelSelect] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [showCustomize, setShowCustomize] = useState<boolean>(false);
   const [showVictory, setShowVictory] = useState<boolean>(false);
   const [showDefeat, setShowDefeat] = useState<boolean>(false);
   const [defeatReason, setDefeatReason] = useState<string>('');
@@ -82,6 +84,12 @@ export default function App() {
   // Audio state
   const [sfxEnabled, setSfxEnabled] = useState<boolean>(KodoAudioManager.sfxEnabled);
   const [musicEnabled, setMusicEnabled] = useState<boolean>(KodoAudioManager.musicEnabled);
+  const [nickname, setNickname] = useState<string>(() => {
+    try { return localStorage.getItem('kodo_nickname') || 'Player'; } catch { return 'Player'; }
+  });
+  const [playerColor, setPlayerColor] = useState<string>(() => {
+    try { return localStorage.getItem('kodo_player_color') || '#0284c7'; } catch { return '#0284c7'; }
+  });
 
   // Runtime metrics
   const [restartKey, setRestartKey] = useState<number>(0);
@@ -278,6 +286,7 @@ export default function App() {
     setArenaResults(null);
     setShowModeSelect(false);
     setShowLevelSelect(false);
+    setShowCustomize(false);
     setScreen('title');
     KodoAudioManager.stopAmbientMusic();
   };
@@ -318,7 +327,7 @@ export default function App() {
         {screen === 'title' && (
           <TitleScreen
             onPlay={() => setShowModeSelect(true)}
-            onOpenLevels={() => setShowLevelSelect(true)}
+            onOpenCustomize={() => setShowCustomize(true)}
             onOpenSettings={() => setShowSettings(true)}
           />
         )}
@@ -373,6 +382,8 @@ export default function App() {
               {mode === 'race' && (
                 <RaceView
                   key={`race-${restartKey}`}
+                  playerName={nickname}
+                  playerColor={playerColor}
                   isPaused={screen !== 'playing' || countdown !== null || showSettings || showLevelSelect || showModeSelect}
                   onWin={(place, _moves, winnerName) => {
                     if (place === 1) {
@@ -388,6 +399,8 @@ export default function App() {
               {mode === 'arena' && (
                 <ArenaView
                   key={`arena-${restartKey}`}
+                  playerName={nickname}
+                  playerColor={playerColor}
                   isPaused={screen !== 'playing' || countdown !== null || showSettings || showLevelSelect || showModeSelect}
                   onComplete={(placements) => {
                     setArenaResults(placements);
@@ -398,6 +411,8 @@ export default function App() {
               {mode === 'survival' && (
                 <SurvivalView
                   key={`survival-${restartKey}`}
+                  playerName={nickname}
+                  playerColor={playerColor}
                   isPaused={screen !== 'playing' || countdown !== null || showSettings || showLevelSelect || showModeSelect}
                   onWin={(survivedSec) => handleWin(3, 0, survivedSec)}
                   onLose={handleLose}
@@ -426,7 +441,14 @@ export default function App() {
             currentCampaignLevel={currentLevelIndex}
             unlockedLevel={unlockedLevel}
             totalLevels={CAMPAIGN_LEVELS.length}
-            onSelectMode={(chosenMode) => handleStartGame(chosenMode)}
+            onSelectMode={(chosenMode) => {
+              if (chosenMode === 'campaign') {
+                setShowModeSelect(false);
+                setShowLevelSelect(true);
+              } else {
+                handleStartGame(chosenMode);
+              }
+            }}
             onOpenLevelGrid={() => {
               setShowModeSelect(false);
               setShowLevelSelect(true);
@@ -456,6 +478,12 @@ export default function App() {
           <SettingsModal
             sfxEnabled={sfxEnabled}
             musicEnabled={musicEnabled}
+            nickname={nickname}
+            onNicknameChange={(value) => {
+              const next = value.trimStart();
+              setNickname(next);
+              try { localStorage.setItem('kodo_nickname', next); } catch {}
+            }}
             onToggleSfx={() => {
               const next = !sfxEnabled;
               setSfxEnabled(next);
@@ -468,6 +496,17 @@ export default function App() {
             }}
             onResetProgress={handleResetProgress}
             onClose={() => setShowSettings(false)}
+          />
+        )}
+
+        {showCustomize && (
+          <CharacterCustomizeModal
+            color={playerColor}
+            onColorChange={(color) => {
+              setPlayerColor(color);
+              try { localStorage.setItem('kodo_player_color', color); } catch {}
+            }}
+            onClose={() => setShowCustomize(false)}
           />
         )}
 
