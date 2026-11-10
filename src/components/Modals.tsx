@@ -266,25 +266,38 @@ export const CharacterCustomizeModal: React.FC<{
             </defs>
             <ellipse cx="90" cy="151" rx="39" ry="7" fill="#020617" opacity=".48" filter="url(#kodo-shadow)" />
             <g className="kodo-character">
-              <path d="M68 81 Q42 69 48 101 Q53 116 73 108Z" fill={color} stroke="#0f172a" strokeOpacity=".2" strokeWidth="2" />
-              <path d="M112 81 Q138 69 132 101 Q127 116 107 108Z" fill={color} stroke="#0f172a" strokeOpacity=".2" strokeWidth="2" />
-              <path d="M76 43 Q68 12 82 27 Q88 34 88 43Z" fill={color} />
-              <path d="M87 42 Q90 7 101 25 Q105 34 98 45Z" fill={color} />
-              <path d="M99 44 Q112 17 117 37 Q118 45 108 51Z" fill={color} />
-              <ellipse cx="90" cy="91" rx="43" ry="47" fill="url(#kodo-body-gradient)" stroke="#bae6fd" strokeOpacity=".42" strokeWidth="2" />
-              <ellipse cx="90" cy="105" rx="27" ry="25" fill="url(#kodo-belly-gradient)" />
-              <ellipse cx="73" cy="96" rx="5" ry="3.5" fill="#fb7185" opacity=".65" />
-              <ellipse cx="107" cy="96" rx="5" ry="3.5" fill="#fb7185" opacity=".65" />
-              <ellipse cx="76" cy="81" rx="8" ry="11" fill="white" />
-              <ellipse cx="104" cy="81" rx="8" ry="11" fill="white" />
-              <ellipse cx="78" cy="82" rx="4.5" ry="6.5" fill="#0f172a" />
-              <ellipse cx="102" cy="82" rx="4.5" ry="6.5" fill="#0f172a" />
-              <circle cx="79.5" cy="79" r="2" fill="white" />
-              <circle cx="103.5" cy="79" r="2" fill="white" />
-              <path d="M81 91 L99 91 L90 103Z" fill="url(#kodo-beak-gradient)" stroke="#b45309" strokeWidth="1" />
-              <ellipse cx="77" cy="137" rx="9" ry="4" fill="#f59e0b" />
-              <ellipse cx="103" cy="137" rx="9" ry="4" fill="#f59e0b" />
-              <path d="M62 77 Q48 83 54 101" fill="none" stroke="white" strokeOpacity=".25" strokeWidth="3" strokeLinecap="round" />
+              <polygon points="58,91 43,82 49,107 66,112" fill={color} />
+              <polygon points="122,91 137,82 131,107 114,112" fill="#075985" />
+              <polygon points="76,47 69,17 86,34 89,49" fill={color} />
+              <polygon points="87,45 92,9 105,30 99,49" fill="#38bdf8" />
+              <polygon points="99,48 119,22 116,48 108,56" fill="#7dd3fc" />
+              <polygon points="48,81 67,75 73,104 58,119 47,102" fill="#075985" />
+              <polygon points="132,81 113,75 107,104 122,119 133,102" fill={color} />
+              <polygon points="90,39 119,48 137,78 131,112 108,139 77,137 52,111 47,78 63,49" fill="#075985" />
+              <polygon points="90,39 119,48 104,82 72,82 63,49" fill={color} />
+              <polygon points="119,48 137,78 131,112 105,95 104,82" fill="#0284c7" />
+              <polygon points="63,49 72,82 52,111 47,78" fill="#38bdf8" />
+              <polygon points="72,82 104,82 112,119 90,139 68,119" fill="#e0f2fe" />
+              <polygon points="72,82 90,84 90,139 68,119" fill="#ffffff" />
+              <polygon points="104,82 112,119 90,139 90,84" fill="#dbeafe" />
+              <polygon points="65,128 84,130 82,143 61,142" fill="#f59e0b" />
+              <polygon points="96,130 115,128 119,142 98,143" fill="#d97706" />
+              <polygon points="69,76 84,72 86,91 72,98" fill="#ffffff" />
+              <polygon points="96,72 111,76 108,98 94,91" fill="#ffffff" />
+              <ellipse cx="78" cy="84" rx="5" ry="7" fill="#172554" />
+              <ellipse cx="102" cy="84" rx="5" ry="7" fill="#172554" />
+              <circle cx="79" cy="81" r="2" fill="white" />
+              <circle cx="103" cy="81" r="2" fill="white" />
+              <polygon points="81,94 99,94 90,108" fill="#f59e0b" stroke="#b45309" strokeWidth="1" />
+              <polygon points="49,103 61,96 70,110 58,120" fill="#075985" />
+              <polygon points="131,103 119,96 110,110 122,120" fill="#0284c7" />
+              <polygon points="53,104 65,99 70,110 59,116" fill="#38bdf8" />
+              <polygon points="127,104 115,99 110,110 121,116" fill="#7dd3fc" />
+              <polygon points="49,108 65,101 115,101 131,108 123,120 57,120" fill="#b91c1c" />
+              <polygon points="49,108 65,101 91,108 87,120 57,120" fill="#ef4444" />
+              <polygon points="91,108 115,101 131,108 123,120 91,119" fill="#dc2626" />
+              <polygon points="98,116 114,114 112,143 102,147 96,140" fill="#dc2626" />
+              <polygon points="98,116 106,115 103,145 96,140" fill="#f87171" />
             </g>
           </svg>
           <div className="relative z-10 -mt-1 text-center">
