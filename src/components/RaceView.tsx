@@ -41,6 +41,7 @@ export const RaceView: React.FC<RaceViewProps> = ({
       personality: 'aggressive',
       alive: true,
       score: 0,
+      nextMoveAt: performance.now() + Math.random() * 700,
     },
     {
       id: 'bot2',
@@ -53,6 +54,7 @@ export const RaceView: React.FC<RaceViewProps> = ({
       personality: 'tricky',
       alive: true,
       score: 0,
+      nextMoveAt: performance.now() + Math.random() * 700,
     },
     {
       id: 'bot3',
@@ -254,12 +256,13 @@ export const RaceView: React.FC<RaceViewProps> = ({
     if (!raceActive || isPaused) return;
 
     botTimerRef.current = setInterval(() => {
+      const now = performance.now();
       const prevBots = botsRef.current;
       const curArena = arenaRef.current;
       let nextPlayerPos = playerPosRef.current;
 
       const updated = prevBots.map((bot) => {
-        if (!bot.alive) return bot;
+        if (!bot.alive || now < (bot.nextMoveAt ?? 0)) return bot;
 
         // Personalities change only shortest-route tie-breaking, never movement speed.
         const directionOrder =
@@ -331,7 +334,9 @@ export const RaceView: React.FC<RaceViewProps> = ({
           nextPlayerPos = { x: pushedPX, y: pushedPY };
         }
 
-        return { ...bot, x: nextStep.x, y: nextStep.y };
+        const pace = bot.personality === 'aggressive' ? 620 : bot.personality === 'tricky' ? 790 : 930;
+        const jitter = Math.random() * 260;
+        return { ...bot, x: nextStep.x, y: nextStep.y, nextMoveAt: now + pace + jitter };
       });
 
       botsRef.current = updated;
@@ -344,7 +349,7 @@ export const RaceView: React.FC<RaceViewProps> = ({
         playerPosRef.current = nextPlayerPos;
         setPlayerPos(nextPlayerPos);
       }
-    }, 850);
+    }, 50);
 
     return () => {
       if (botTimerRef.current) clearInterval(botTimerRef.current);
