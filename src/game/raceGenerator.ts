@@ -22,18 +22,39 @@ const rotatePoint = (point: Point, turns: number): Point => {
 function createComplexRaceCandidate(): RaceArena {
   const grid = Array.from({ length: RACE_SIZE }, () => Array<number>(RACE_SIZE).fill(0));
 
-  // A deliberately winding 17-step route from the south-west spawn to the summit.
-  // The other three routes are exact 90-degree rotations, so nobody gets a shorter lane.
-  const route: Point[] = [
-    { x: 1, y: 15 }, { x: 1, y: 14 }, { x: 1, y: 13 },
-    { x: 2, y: 13 }, { x: 3, y: 13 }, { x: 3, y: 14 },
-    { x: 4, y: 14 }, { x: 5, y: 14 }, { x: 5, y: 13 },
-    { x: 5, y: 12 }, { x: 5, y: 11 }, { x: 6, y: 11 },
-    { x: 7, y: 11 }, { x: 7, y: 10 }, { x: 7, y: 9 },
-    { x: 8, y: 9 }, { x: 8, y: 8 },
+  // Randomized but mirrored spawn lanes. Every lane gets the same route after rotation.
+  const spawnOptions: Point[] = [
+    { x: 0, y: 15 }, { x: 1, y: 16 }, { x: 2, y: 16 },
+    { x: 0, y: 14 }, { x: 1, y: 15 },
   ];
-  const elevations = [0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0];
+  const start = spawnOptions[Math.floor(Math.random() * spawnOptions.length)];
+  const route: Point[] = [{ ...start }];
+  let cursor = { ...start };
 
+  // Add a small opening dog-leg so routes are not just a straight diagonal.
+  const detour = cursor.x > 0 ? { x: -1, y: 0 } : { x: 1, y: 0 };
+  cursor = { x: cursor.x + detour.x, y: cursor.y + detour.y };
+  route.push({ ...cursor });
+  cursor = { x: cursor.x - detour.x, y: cursor.y - detour.y };
+  route.push({ ...cursor });
+
+  // Randomly interleave the required east/north steps. The path shape changes each round.
+  const moves = [
+    ...Array(Math.max(0, RACE_CENTER - cursor.x)).fill('right'),
+    ...Array(Math.max(0, cursor.y - RACE_CENTER)).fill('up'),
+  ] as ('right' | 'up')[];
+  for (let i = moves.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [moves[i], moves[j]] = [moves[j], moves[i]];
+  }
+  for (const move of moves) {
+    cursor = move === 'right'
+      ? { x: cursor.x + 1, y: cursor.y }
+      : { x: cursor.x, y: cursor.y - 1 };
+    route.push({ ...cursor });
+  }
+
+  const elevations = route.map((_, index) => (index > 2 && index % 5 === 0 ? 1 : 0));
   for (let rotation = 0; rotation < 4; rotation++) {
     route.forEach((point, index) => {
       const p = rotatePoint(point, rotation);
@@ -41,35 +62,34 @@ function createComplexRaceCandidate(): RaceArena {
     });
   }
 
-  // Low, rotationally symmetric obstacle clusters. Keep them at the same
-  // maximum elevation as the route so they never become tall visual barriers.
-  const wallCandidates: Point[] = [
-    { x: 2, y: 10 }, { x: 2, y: 11 }, { x: 3, y: 10 },
-    { x: 4, y: 12 }, { x: 4, y: 13 }, { x: 6, y: 13 },
-    { x: 6, y: 14 }, { x: 7, y: 13 }, { x: 2, y: 7 },
-    { x: 3, y: 7 }, { x: 4, y: 7 }, { x: 6, y: 6 },
-  ];
-  const shuffled = [...wallCandidates].sort(() => Math.random() - 0.5);
-  const wallCount = 3 + Math.floor(Math.random() * 3);
+  // Random low obstacle clusters, mirrored to preserve equal opportunities.
+  const candidates: Point[] = [];
+  for (let y = 7; y <= 15; y++) {
+    for (let x = 1; x <= 7; x++) {
+      if (Math.abs(x - y) > 1 && Math.random() < 0.24) candidates.push({ x, y });
+    }
+  }
+  for (let i = candidates.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+  }
   let placed = 0;
-  for (const candidate of shuffled) {
-    if (placed >= wallCount) break;
+  for (const candidate of candidates) {
+    if (placed >= 5) break;
     const orbit = [0, 1, 2, 3].map((turn) => rotatePoint(candidate, turn));
     if (orbit.some((p) => grid[p.y][p.x] > 0)) continue;
     for (const p of orbit) grid[p.y][p.x] = 2;
     placed++;
   }
 
-  // Low side ledges and modest raised platforms add visual variety while keeping racers visible.
-  const ledgeCandidates: Point[] = [
-    { x: 2, y: 8 }, { x: 3, y: 8 }, { x: 4, y: 9 },
-    { x: 4, y: 10 }, { x: 6, y: 8 }, { x: 6, y: 10 },
-  ];
-  for (const candidate of ledgeCandidates) {
-    if (Math.random() > 0.45) continue;
-    for (let turn = 0; turn < 4; turn++) {
-      const p = rotatePoint(candidate, turn);
-      if (grid[p.y][p.x] === 0) grid[p.y][p.x] = 2;
+  // Small raised ledges add visual variety without tall sight-blocking walls.
+  for (let y = 6; y <= 14; y++) {
+    for (let x = 2; x <= 7; x++) {
+      if (Math.random() > 0.08) continue;
+      for (let turn = 0; turn < 4; turn++) {
+        const p = rotatePoint({ x, y }, turn);
+        if (grid[p.y][p.x] === 0) grid[p.y][p.x] = 2;
+      }
     }
   }
 
@@ -77,12 +97,7 @@ function createComplexRaceCandidate(): RaceArena {
     size: RACE_SIZE,
     grid,
     finish: { x: RACE_CENTER, y: RACE_CENTER },
-    spawns: [
-      { x: 1, y: 15 },
-      { x: 15, y: 15 },
-      { x: 15, y: 1 },
-      { x: 1, y: 1 },
-    ],
+    spawns: [0, 1, 2, 3].map((turn) => rotatePoint(start, turn)),
   };
 }
 
@@ -171,7 +186,6 @@ export function generateFairRaceArena(size: number = 14): RaceArena {
     const candidate = createComplexRaceCandidate();
     if (isRaceArenaFair(candidate)) return candidate;
   }
-  // Deterministic symmetric fallback uses the same winding route without random cliffs.
-  const fallback = createComplexRaceCandidate();
-  return fallback;
+  // Retry with a fresh randomized candidate; mirrored construction preserves fairness.
+  return createComplexRaceCandidate();
 }
