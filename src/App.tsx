@@ -104,6 +104,7 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('autostart') === '1') {
       setScreen('playing');
+      setCountdown(3);
     }
   }, []);
 
@@ -197,21 +198,6 @@ export default function App() {
 
   // Next Level in Campaign
   const handleNextLevel = () => {
-    if (currentLevelIndex < CAMPAIGN_LEVELS.length - 1) {
-      const nextIdx = currentLevelIndex + 1;
-      setCurrentLevelIndex(nextIdx);
-      if (nextIdx > unlockedLevel) {
-        setUnlockedLevel(nextIdx);
-        try {
-          localStorage.setItem('kodo_unlocked', String(nextIdx));
-        } catch {}
-      }
-      handleRestart();
-    }
-  };
-
-  // Skip Level
-  const handleSkipLevel = () => {
     if (currentLevelIndex < CAMPAIGN_LEVELS.length - 1) {
       const nextIdx = currentLevelIndex + 1;
       setCurrentLevelIndex(nextIdx);
