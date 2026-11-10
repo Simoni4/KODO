@@ -13,6 +13,8 @@ export interface ArenaPlacement {
 
 interface ArenaViewProps {
   isPaused?: boolean;
+  playerName?: string;
+  playerColor?: string;
   onComplete: (placements: ArenaPlacement[]) => void;
   onPlayerEliminated?: (place: number) => void;
 }
@@ -20,22 +22,22 @@ interface ArenaViewProps {
 const SIZE = 22;
 const COLORS = ['#f97316', '#a855f7', '#22c55e', '#eab308', '#ec4899', '#06b6d4', '#ef4444'];
 
-function createContestants(): SurvivalEntity[] {
+function createContestants(playerName = 'Player'): SurvivalEntity[] {
   const starts = [
     [2, 2], [11, 2], [19, 2], [2, 11],
     [19, 11], [2, 19], [11, 19], [19, 19],
   ];
-  const names = ['Kodo', 'Brr', 'Pip', 'Mochi', 'Frost', 'Kiwi', 'Nix', 'Bobo'];
+  const names = [playerName, 'Brr', 'Pip', 'Mochi', 'Frost', 'Kiwi', 'Nix', 'Bobo'];
   return starts.map(([x, y], i) => ({
     id: `arena-${i}`, name: names[i], x, y,
     isPlayer: i === 0, color: i === 0 ? '#0284c7' : COLORS[i - 1], alive: true,
   }));
 }
 
-export const ArenaView: React.FC<ArenaViewProps> = ({ isPaused = false, onComplete, onPlayerEliminated }) => {
+export const ArenaView: React.FC<ArenaViewProps> = ({ isPaused = false, playerName = 'Player', playerColor = '#0284c7', onComplete, onPlayerEliminated }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rendererRef = useRef(new IsometricRenderer());
-  const [players, setPlayers] = useState<SurvivalEntity[]>(createContestants);
+  const [players, setPlayers] = useState<SurvivalEntity[]>(() => createContestants(playerName));
   const [playerPlace, setPlayerPlace] = useState<number | null>(null);
   const playersRef = useRef(players);
   const [tiles] = useState<Map<string, SurvivalTileState>>(() => {
@@ -189,9 +191,12 @@ export const ArenaView: React.FC<ArenaViewProps> = ({ isPaused = false, onComple
         }
         drawables.push({key:(p.x+p.y)*10+5,draw:()=>{
           ctx.fillStyle='rgba(15,23,42,.4)'; ctx.beginPath(); ctx.ellipse(iso.x,iso.y+renderer.tileH/2+2,16,8,0,0,Math.PI*2); ctx.fill();
-          renderer.drawKodoBird(ctx,iso.x,iso.y,p.isPlayer?facingRef.current:'front',false,0,animTimeRef.current,p.isPlayer?undefined:p.color);
-          ctx.fillStyle=p.isPlayer?'#0284c7':p.color; ctx.beginPath(); ctx.roundRect(iso.x-24,iso.y-44,48,15,6); ctx.fill();
-          ctx.fillStyle='#fff'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center'; ctx.fillText(p.name,iso.x,iso.y-33);
+          renderer.drawKodoBird(ctx,iso.x,iso.y,p.isPlayer?facingRef.current:'front',false,0,animTimeRef.current,p.isPlayer?playerColor:p.color);
+          const displayName = p.isPlayer ? playerName : p.name;
+          ctx.font='bold 9px sans-serif';
+          const badgeWidth = Math.max(42, Math.min(104, ctx.measureText(displayName).width + 16));
+          ctx.fillStyle=p.isPlayer?playerColor:p.color; ctx.beginPath(); ctx.roundRect(iso.x-badgeWidth/2,iso.y-44,badgeWidth,15,6); ctx.fill();
+          ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.fillText(displayName,iso.x,iso.y-33);
         }});
       }
       drawables.sort((a,b)=>a.key-b.key).forEach(d=>d.draw());
