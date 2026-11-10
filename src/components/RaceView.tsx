@@ -100,7 +100,7 @@ export const RaceView: React.FC<RaceViewProps> = ({
     setPlayerPos(newArena.spawns[0]);
     setBots(freshBots);
     setRaceActive(true);
-  }, []);
+  }, [playerName, playerColor]);
 
   const isCellWalkableSync = useCallback((x: number, y: number) => {
     const curArena = arenaRef.current;
