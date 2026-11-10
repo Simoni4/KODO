@@ -40,14 +40,12 @@ function createComplexRaceCandidate(): RaceArena {
     }
   }
   for (const anchor of platformAnchors) {
-    for (let turn = 0; turn < 4; turn++) {
-      const p = rotatePoint(anchor, turn);
-      for (let oy = 0; oy < 2; oy++) {
-        for (let ox = 0; ox < 2; ox++) {
-          const x = p.x + ox;
-          const y = p.y + oy;
-          if (x >= 0 && x <= RACE_MAX_SYM && y >= 0 && y <= RACE_MAX_SYM) {
-            grid[y][x] = 2;
+    for (let oy = 0; oy < 2; oy++) {
+      for (let ox = 0; ox < 2; ox++) {
+        for (let turn = 0; turn < 4; turn++) {
+          const p = rotatePoint({ x: anchor.x + ox, y: anchor.y + oy }, turn);
+          if (p.x >= 0 && p.x <= RACE_MAX_SYM && p.y >= 0 && p.y <= RACE_MAX_SYM) {
+            grid[p.y][p.x] = 2;
           }
         }
       }
@@ -75,16 +73,6 @@ function createComplexRaceCandidate(): RaceArena {
   for (let y = RACE_CENTER - 1; y <= RACE_CENTER + 1; y++) {
     for (let x = RACE_CENTER - 1; x <= RACE_CENTER + 1; x++) grid[y][x] = 2;
   }
-  for (const spawn of spawns) {
-    for (let oy = -1; oy <= 0; oy++) {
-      for (let ox = 0; ox <= 1; ox++) {
-        const x = spawn.x + ox;
-        const y = spawn.y + oy;
-        if (x >= 0 && x <= RACE_MAX_SYM && y >= 0 && y <= RACE_MAX_SYM) grid[y][x] = 1;
-      }
-    }
-  }
-
   return { size: RACE_SIZE, grid, finish: { x: RACE_CENTER, y: RACE_CENTER }, spawns };
 }
 
