@@ -32,10 +32,8 @@ function createComplexRaceCandidate(): RaceArena {
   let cursor = { ...start };
 
   // Add a small opening dog-leg so routes are not just a straight diagonal.
-  const detour = cursor.x > 0 ? { x: -1, y: 0 } : { x: 1, y: 0 };
+  const detour = cursor.x > 0 ? { x: -1, y: 0 } : { x: 0, y: 1 };
   cursor = { x: cursor.x + detour.x, y: cursor.y + detour.y };
-  route.push({ ...cursor });
-  cursor = { x: cursor.x - detour.x, y: cursor.y - detour.y };
   route.push({ ...cursor });
 
   // Randomly interleave the required east/north steps. The path shape changes each round.
