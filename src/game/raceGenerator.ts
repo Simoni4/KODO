@@ -12,7 +12,7 @@ export interface RaceArena {
  * Guarantees that all 4 racers (Player + 3 AI Bots) have identical path length,
  * identical elevation climbs (+1 / -1 block steps), and zero directional advantage.
  */
-export function generateFairRaceArena(size: number = 14): RaceArena {
+function generateRaceArenaCandidate(size: number = 14): RaceArena {
   const center = 6; // Exact 4-fold rotational center (6, 6) inside the 14x14 grid
   const maxSym = center * 2; // 12 (0..12 symmetric span, with index 13 as outer glacier rim)
   const grid: number[][] = Array.from({ length: size }, () =>
@@ -130,4 +130,139 @@ export function generateFairRaceArena(size: number = 14): RaceArena {
     finish: { x: center, y: center },
     spawns,
   };
+}
+
+
+/**
+ * Verifies the properties that make a generated race fair:
+ * - the playable 13x13 area is 4-fold rotationally symmetric;
+ * - all four spawns and the finish are reachable using legal one-level steps;
+ * - every racer has the same shortest distance and the same number of shortest routes.
+ */
+export function isRaceArenaFair(arena: RaceArena): boolean {
+  const { size, grid, finish, spawns } = arena;
+  const center = 6;
+  const maxSym = center * 2;
+
+  if (size < maxSym + 1 || grid.length !== size || grid.some((row) => row.length !== size)) {
+    return false;
+  }
+  if (spawns.length !== 4) return false;
+
+  for (let y = 0; y <= maxSym; y++) {
+    for (let x = 0; x <= maxSym; x++) {
+      const orbit: [number, number][] = [
+        [x, y],
+        [y, maxSym - x],
+        [maxSym - x, maxSym - y],
+        [maxSym - y, x],
+      ];
+      const value = grid[y][x];
+      if (orbit.some(([rx, ry]) => grid[ry][rx] !== value)) return false;
+    }
+  }
+
+  const isInsideAndWalkable = (p: Point) =>
+    p.x >= 0 && p.x < size && p.y >= 0 && p.y < size && grid[p.y][p.x] > 0;
+
+  if (!isInsideAndWalkable(finish) || spawns.some((spawn) => !isInsideAndWalkable(spawn))) {
+    return false;
+  }
+
+  const shortestRouteStats = (start: Point): { distance: number; routes: number } => {
+    const distances = Array.from({ length: size }, () => Array<number>(size).fill(-1));
+    const routeCounts = Array.from({ length: size }, () => Array<number>(size).fill(0));
+    const queue: Point[] = [start];
+    let head = 0;
+
+    distances[start.y][start.x] = 0;
+    routeCounts[start.y][start.x] = 1;
+
+    const directions = [
+      [0, -1],
+      [0, 1],
+      [-1, 0],
+      [1, 0],
+    ] as const;
+
+    while (head < queue.length) {
+      const current = queue[head++];
+      for (const [dx, dy] of directions) {
+        const x = current.x + dx;
+        const y = current.y + dy;
+        if (x < 0 || x >= size || y < 0 || y >= size) continue;
+
+        const fromHeight = grid[current.y][current.x];
+        const toHeight = grid[y][x];
+        if (toHeight <= 0 || Math.abs(toHeight - fromHeight) > 1) continue;
+
+        const nextDistance = distances[current.y][current.x] + 1;
+        if (distances[y][x] === -1) {
+          distances[y][x] = nextDistance;
+          routeCounts[y][x] = routeCounts[current.y][current.x];
+          queue.push({ x, y });
+        } else if (distances[y][x] === nextDistance) {
+          routeCounts[y][x] += routeCounts[current.y][current.x];
+        }
+      }
+    }
+
+    return {
+      distance: distances[finish.y][finish.x],
+      routes: routeCounts[finish.y][finish.x],
+    };
+  };
+
+  const results = spawns.map(shortestRouteStats);
+  const first = results[0];
+  return (
+    first.distance >= 0 &&
+    first.routes > 0 &&
+    results.every((result) =>
+      result.distance === first.distance && result.routes === first.routes
+    )
+  );
+}
+
+/** Returns a simple, symmetric connected arena if random candidates ever fail validation. */
+function createSafeFallbackArena(size: number): RaceArena {
+  const grid = Array.from({ length: size }, () => Array<number>(size).fill(0));
+  const center = 6;
+
+  for (let y = 1; y <= 11; y++) {
+    for (let x = 1; x <= 11; x++) {
+      grid[y][x] = 1;
+    }
+  }
+  for (let y = center - 1; y <= center + 1; y++) {
+    for (let x = center - 1; x <= center + 1; x++) {
+      grid[y][x] = 2;
+    }
+  }
+  grid[center][center] = 3;
+
+  return {
+    size,
+    grid,
+    finish: { x: center, y: center },
+    spawns: [
+      { x: 1, y: 11 },
+      { x: 11, y: 11 },
+      { x: 11, y: 1 },
+      { x: 1, y: 1 },
+    ],
+  };
+}
+
+/**
+ * Generates candidates until the route validator confirms equal, legal race routes.
+ * The fallback is deliberately simple and symmetric, so generation cannot soft-lock a match.
+ */
+export function generateFairRaceArena(size: number = 14): RaceArena {
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const candidate = generateRaceArenaCandidate(size);
+    if (isRaceArenaFair(candidate)) return candidate;
+  }
+
+  return createSafeFallbackArena(size);
 }
