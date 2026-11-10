@@ -6,7 +6,8 @@ export function bfsShortestPath(
   isWalkable: (x: number, y: number) => boolean,
   width: number,
   height: number,
-  canTraverse?: (fromX: number, fromY: number, toX: number, toY: number) => boolean
+  canTraverse?: (fromX: number, fromY: number, toX: number, toY: number) => boolean,
+  directionOrder?: { x: number; y: number }[]
 ): Point[] | null {
   const inBounds = (p: Point) =>
     p.x >= 0 && p.x < width && p.y >= 0 && p.y < height;
@@ -27,7 +28,7 @@ export function bfsShortestPath(
   visited.add(key(start));
   parent.set(key(start), null);
 
-  const directions = [
+  const directions = directionOrder ?? [
     { x: 0, y: -1 }, // up
     { x: 0, y: 1 },  // down
     { x: -1, y: 0 }, // left
