@@ -285,13 +285,23 @@ function expandRaceArena(base: RaceArena): RaceArena {
     }
   }
 
-  // Four rotationally symmetric corridors, each exactly four steps long.
-  const corridors: Point[][] = [
-    [{ x: 1, y: 15 }, { x: 1, y: 14 }, { x: 1, y: 13 }, { x: 2, y: 13 }, { x: 3, y: 13 }],
-    [{ x: 15, y: 15 }, { x: 15, y: 14 }, { x: 15, y: 13 }, { x: 14, y: 13 }, { x: 13, y: 13 }],
-    [{ x: 15, y: 1 }, { x: 15, y: 2 }, { x: 15, y: 3 }, { x: 14, y: 3 }, { x: 13, y: 3 }],
-    [{ x: 1, y: 1 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 }],
+  // Build one four-step approach and rotate it exactly around the center,
+  // guaranteeing identical corridor geometry for all four contestants.
+  const firstCorridor: Point[] = [
+    { x: 1, y: 15 },
+    { x: 1, y: 14 },
+    { x: 1, y: 13 },
+    { x: 2, y: 13 },
+    { x: 3, y: 13 },
   ];
+  const corridors: Point[][] = [];
+  for (let rotation = 0; rotation < 4; rotation++) {
+    let corridor = firstCorridor.map((point) => ({ ...point }));
+    for (let turn = 0; turn < rotation; turn++) {
+      corridor = corridor.map((point) => ({ x: point.y, y: 16 - point.x }));
+    }
+    corridors.push(corridor);
+  }
   for (const corridor of corridors) {
     for (const point of corridor) grid[point.y][point.x] = 1;
   }
