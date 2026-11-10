@@ -155,7 +155,7 @@ function generateRaceArenaCandidate(size: number = 14): RaceArena {
  */
 export function isRaceArenaFair(arena: RaceArena): boolean {
   const { size, grid, finish, spawns } = arena;
-  const center = 6;
+  const center = Math.floor((size - 2) / 2);
   const maxSym = center * 2;
 
   if (size < maxSym + 1 || grid.length !== size || grid.some((row) => row.length !== size)) {
@@ -269,10 +269,61 @@ function createSafeFallbackArena(size: number): RaceArena {
 }
 
 /**
+ * Extends the original symmetric arena with four equal-length approach corridors.
+ * This adds four moves to every route without giving any racer a directional advantage.
+ */
+function expandRaceArena(base: RaceArena): RaceArena {
+  const size = 18;
+  const offset = 2;
+  const grid = Array.from({ length: size }, () => Array<number>(size).fill(0));
+
+  for (let y = 0; y < base.size; y++) {
+    for (let x = 0; x < base.size; x++) {
+      const targetX = x + offset;
+      const targetY = y + offset;
+      if (targetX < size && targetY < size) grid[targetY][targetX] = base.grid[y][x];
+    }
+  }
+
+  // Four rotationally symmetric corridors, each exactly four steps long.
+  const corridors: Point[][] = [
+    [{ x: 1, y: 15 }, { x: 1, y: 14 }, { x: 1, y: 13 }, { x: 2, y: 13 }, { x: 3, y: 13 }],
+    [{ x: 15, y: 15 }, { x: 15, y: 14 }, { x: 15, y: 13 }, { x: 14, y: 13 }, { x: 13, y: 13 }],
+    [{ x: 15, y: 1 }, { x: 15, y: 2 }, { x: 15, y: 3 }, { x: 14, y: 3 }, { x: 13, y: 3 }],
+    [{ x: 1, y: 1 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 }],
+  ];
+  for (const corridor of corridors) {
+    for (const point of corridor) grid[point.y][point.x] = 1;
+  }
+
+  return {
+    size,
+    grid,
+    finish: { x: base.finish.x + offset, y: base.finish.y + offset },
+    spawns: [
+      { x: 1, y: 15 },
+      { x: 15, y: 15 },
+      { x: 15, y: 1 },
+      { x: 1, y: 1 },
+    ],
+  };
+}
+
+/**
  * Generates candidates until the route validator confirms equal, legal race routes.
- * The fallback is deliberately simple and symmetric, so generation cannot soft-lock a match.
+ * AI Race uses an extended 18x18 board so each racer must make a longer approach to the summit.
  */
 export function generateFairRaceArena(size: number = 14): RaceArena {
+  if (size >= 18) {
+    for (let attempt = 0; attempt < 40; attempt++) {
+      const base = generateRaceArenaCandidate(14);
+      if (!isRaceArenaFair(base)) continue;
+      const extended = expandRaceArena(base);
+      if (isRaceArenaFair(extended)) return extended;
+    }
+    return expandRaceArena(createSafeFallbackArena(14));
+  }
+
   for (let attempt = 0; attempt < 40; attempt++) {
     const candidate = generateRaceArenaCandidate(size);
     if (isRaceArenaFair(candidate)) return candidate;
