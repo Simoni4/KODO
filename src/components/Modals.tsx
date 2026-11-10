@@ -230,29 +230,99 @@ export const CharacterCustomizeModal: React.FC<{
     { value: '#eab308', label: 'Golden' },
     { value: '#10b981', label: 'Mint' },
   ];
+
+  const selected = colors.find((option) => option.value === color) || colors[0];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-xs">
       <div className="w-full max-w-sm rounded-3xl border-2 border-violet-400/40 bg-slate-900 p-5 shadow-2xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-black uppercase tracking-wide text-white">Customize Kodo</h2>
-          <button onClick={onClose} aria-label="Close" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-300">×</button>
-        </div>
-        <div className="mb-4 flex flex-col items-center rounded-2xl border border-slate-700 bg-gradient-to-b from-sky-950 to-slate-950 p-5">
-          <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/20 shadow-xl" style={{ background: "radial-gradient(circle at 35% 30%, #ffffff, " + color + " 48%, #0f172a)" }}>
-            <span className="text-5xl drop-shadow-lg">🐦</span>
+          <div>
+            <h2 className="text-lg font-black uppercase tracking-wide text-white">Customize Kodo</h2>
+            <p className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-violet-300">Character preview</p>
           </div>
-          <span className="text-sm font-black text-white">Your Kodo</span>
-          <span className="text-[10px] text-slate-400">More outfits and accessories coming soon</span>
+          <button onClick={onClose} aria-label="Close" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700">×</button>
         </div>
-        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-sky-200">Body color</p>
+
+        <div className="relative mb-5 flex h-52 flex-col items-center justify-center overflow-hidden rounded-2xl border border-sky-400/20 bg-gradient-to-b from-sky-900 via-slate-900 to-slate-950">
+          <div className="pointer-events-none absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle, rgba(186,230,253,.7) 1px, transparent 1.5px)', backgroundSize: '22px 22px' }} />
+          <div className="absolute bottom-7 h-5 w-28 rounded-full bg-slate-950/70 blur-md" />
+          <svg viewBox="0 0 180 170" role="img" aria-label={selected.label + ' Kodo character preview'} className="relative z-10 h-40 w-40 overflow-visible" style={{ animation: 'kodo-preview-hop 1.45s ease-in-out infinite' }}>
+            <defs>
+              <radialGradient id="kodo-body-gradient" cx="32%" cy="24%" r="78%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity=".58" />
+                <stop offset="42%" stopColor={color} />
+                <stop offset="100%" stopColor="#0f172a" stopOpacity=".72" />
+              </radialGradient>
+              <linearGradient id="kodo-belly-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ffffff" />
+                <stop offset="100%" stopColor="#dbeafe" />
+              </linearGradient>
+              <linearGradient id="kodo-beak-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#fde047" />
+                <stop offset="100%" stopColor="#d97706" />
+              </linearGradient>
+              <filter id="kodo-shadow"><feGaussianBlur stdDeviation="2.5" /></filter>
+            </defs>
+            <ellipse cx="90" cy="151" rx="39" ry="7" fill="#020617" opacity=".48" filter="url(#kodo-shadow)" />
+            <g className="kodo-character">
+              <path d="M68 81 Q42 69 48 101 Q53 116 73 108Z" fill={color} stroke="#0f172a" strokeOpacity=".2" strokeWidth="2" />
+              <path d="M112 81 Q138 69 132 101 Q127 116 107 108Z" fill={color} stroke="#0f172a" strokeOpacity=".2" strokeWidth="2" />
+              <path d="M76 43 Q68 12 82 27 Q88 34 88 43Z" fill={color} />
+              <path d="M87 42 Q90 7 101 25 Q105 34 98 45Z" fill={color} />
+              <path d="M99 44 Q112 17 117 37 Q118 45 108 51Z" fill={color} />
+              <ellipse cx="90" cy="91" rx="43" ry="47" fill="url(#kodo-body-gradient)" stroke="#bae6fd" strokeOpacity=".42" strokeWidth="2" />
+              <ellipse cx="90" cy="105" rx="27" ry="25" fill="url(#kodo-belly-gradient)" />
+              <ellipse cx="73" cy="96" rx="5" ry="3.5" fill="#fb7185" opacity=".65" />
+              <ellipse cx="107" cy="96" rx="5" ry="3.5" fill="#fb7185" opacity=".65" />
+              <ellipse cx="76" cy="81" rx="8" ry="11" fill="white" />
+              <ellipse cx="104" cy="81" rx="8" ry="11" fill="white" />
+              <ellipse cx="78" cy="82" rx="4.5" ry="6.5" fill="#0f172a" />
+              <ellipse cx="102" cy="82" rx="4.5" ry="6.5" fill="#0f172a" />
+              <circle cx="79.5" cy="79" r="2" fill="white" />
+              <circle cx="103.5" cy="79" r="2" fill="white" />
+              <path d="M81 91 L99 91 L90 103Z" fill="url(#kodo-beak-gradient)" stroke="#b45309" strokeWidth="1" />
+              <ellipse cx="77" cy="137" rx="9" ry="4" fill="#f59e0b" />
+              <ellipse cx="103" cy="137" rx="9" ry="4" fill="#f59e0b" />
+              <path d="M62 77 Q48 83 54 101" fill="none" stroke="white" strokeOpacity=".25" strokeWidth="3" strokeLinecap="round" />
+            </g>
+          </svg>
+          <div className="relative z-10 -mt-1 text-center">
+            <div className="text-sm font-black text-white">Your Kodo</div>
+            <div className="text-[10px] font-semibold text-sky-200">{selected.label}</div>
+          </div>
+          <style>{`
+            @keyframes kodo-preview-hop {
+              0%, 100% { transform: translateY(8px) scaleX(1.04) scaleY(.94); }
+              18% { transform: translateY(5px) scaleX(1.08) scaleY(.9); }
+              42% { transform: translateY(-22px) scaleX(.96) scaleY(1.06); }
+              62% { transform: translateY(-18px) scaleX(.98) scaleY(1.04); }
+              82% { transform: translateY(2px) scaleX(1.06) scaleY(.92); }
+            }
+          `}</style>
+        </div>
+
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-xs font-black uppercase tracking-wide text-sky-200">Body color</p>
+          <span className="text-[10px] font-semibold text-slate-400">Live preview</span>
+        </div>
         <div className="grid grid-cols-5 gap-2">
-          {colors.map(option => (
-            <button key={option.value} onClick={() => onColorChange(option.value)} aria-label={option.label} title={option.label} className={"flex aspect-square items-center justify-center rounded-xl border-2 " + (color === option.value ? "border-white ring-2 ring-sky-400" : "border-slate-600")} style={{ backgroundColor: option.value }}>
-              {color === option.value && <span className="text-lg font-black text-white">✓</span>}
+          {colors.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => onColorChange(option.value)}
+              aria-label={option.label}
+              aria-pressed={color === option.value}
+              title={option.label}
+              className={"group flex flex-col items-center gap-1 rounded-xl border-2 p-2 transition-all " + (color === option.value ? "border-white bg-slate-700/80 shadow-lg shadow-sky-500/20" : "border-slate-700 bg-slate-800/70 hover:border-slate-500")}
+            >
+              <span className="h-7 w-7 rounded-full border-2 border-white/30 shadow-inner" style={{ backgroundColor: option.value }} />
+              <span className="text-[9px] font-bold text-slate-300">{option.label}</span>
+              {color === option.value && <span className="text-[9px] font-black uppercase text-sky-300">Selected</span>}
             </button>
           ))}
         </div>
-        <button onClick={onClose} className="mt-5 w-full rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 py-3 text-sm font-black uppercase text-white">Save appearance</button>
+        <button onClick={onClose} className="mt-5 w-full rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 py-3 text-sm font-black uppercase text-white shadow-lg shadow-violet-950/30 hover:brightness-110">Save appearance</button>
       </div>
     </div>
   );
