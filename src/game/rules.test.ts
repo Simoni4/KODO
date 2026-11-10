@@ -278,7 +278,7 @@ test('AI Race uses a longer 18x18 symmetric arena with equal legal routes', () =
     assert.equal(arena.size, 18);
     assert.deepEqual(arena.finish, { x: 8, y: 8 });
     assert.equal(arena.spawns.length, 4);
-    const allowedStarts = ['0,15', '1,16', '2,16', '0,14', '1,15'];
+    const allowedStarts = ['0,16'];
     assert.ok(allowedStarts.includes(`${arena.spawns[0].x},${arena.spawns[0].y}`));
     assert.deepEqual(
       arena.spawns.slice(1),
