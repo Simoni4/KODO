@@ -8,12 +8,16 @@ import { KodoAudioManager } from '../game/audio';
 
 interface RaceViewProps {
   isPaused?: boolean;
+  playerName?: string;
+  playerColor?: string;
   onWin: (place: number, timeSeconds: number, winnerName: string) => void;
   onRankChange?: (rank: number) => void;
 }
 
 export const RaceView: React.FC<RaceViewProps> = ({
   isPaused = false,
+  playerName = 'Player',
+  playerColor = '#0284c7',
   onWin,
   onRankChange,
 }) => {
@@ -560,15 +564,19 @@ export const RaceView: React.FC<RaceViewProps> = ({
             playerFacingRef.current,
             false,
             0,
-            animTime
+            animTime,
+            playerColor
           );
 
-          ctx.fillStyle = '#0284c7';
-          ctx.fillRect(playerScreen.x - 20, playerScreen.y - 42 + idleBob, 40, 14);
-          ctx.fillStyle = '#ffffff';
           ctx.font = 'bold 9px sans-serif';
+          const badgeWidth = Math.max(42, Math.min(104, ctx.measureText(playerName).width + 16));
+          ctx.fillStyle = playerColor;
+          ctx.beginPath();
+          ctx.roundRect(playerScreen.x - badgeWidth / 2, playerScreen.y - 42 + idleBob, badgeWidth, 14, 5);
+          ctx.fill();
+          ctx.fillStyle = '#ffffff';
           ctx.textAlign = 'center';
-          ctx.fillText('YOU', playerScreen.x, playerScreen.y - 31 + idleBob);
+          ctx.fillText(playerName, playerScreen.x, playerScreen.y - 31 + idleBob);
         },
       });
 
