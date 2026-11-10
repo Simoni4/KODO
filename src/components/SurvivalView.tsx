@@ -6,6 +6,8 @@ import { KodoAudioManager } from '../game/audio';
 
 interface SurvivalViewProps {
   isPaused?: boolean;
+  playerName?: string;
+  playerColor?: string;
   onWin: (survivalTimeSeconds: number) => void;
   onLose: (reason: string) => void;
   onAliveCountChange?: (count: number) => void;
@@ -13,6 +15,8 @@ interface SurvivalViewProps {
 
 export const SurvivalView: React.FC<SurvivalViewProps> = ({
   isPaused = false,
+  playerName = 'Player',
+  playerColor = '#0284c7',
   onWin,
   onLose,
   onAliveCountChange,
@@ -515,22 +519,24 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
               false,
               0,
               animTime,
-              p.isPlayer ? undefined : p.color
+              p.isPlayer ? playerColor : p.color
             );
 
             // Name Badge
-            ctx.fillStyle = p.isPlayer ? '#0284c7' : p.color;
+            const displayName = p.isPlayer ? playerName : p.name;
+            ctx.font = 'bold 9px sans-serif';
+            const badgeWidth = Math.max(42, Math.min(104, ctx.measureText(displayName).width + 16));
+            ctx.fillStyle = p.isPlayer ? playerColor : p.color;
             ctx.beginPath();
-            ctx.roundRect(pIso.x - 24, pIso.y - 44 + idleBob, 48, 15, 6);
+            ctx.roundRect(pIso.x - badgeWidth / 2, pIso.y - 44 + idleBob, badgeWidth, 15, 6);
             ctx.fill();
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
             ctx.lineWidth = 1;
             ctx.stroke();
 
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 9px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(p.name, pIso.x, pIso.y - 33 + idleBob);
+            ctx.fillText(displayName, pIso.x, pIso.y - 33 + idleBob);
           },
         });
       }
