@@ -1,4 +1,4 @@
-export type GameMode = 'campaign' | 'race' | 'survival';
+export type GameMode = 'campaign' | 'race' | 'survival' | 'arena';
 
 export interface Point {
   x: number;
