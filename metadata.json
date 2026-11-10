@@ -1,0 +1,6 @@
+{
+  "name": "Kodo (Winter Edition)",
+  "description": "Isometric puzzle and casual arcade game with campaign levels, AI bot racing, and survival arenas set in a peaceful winter biome.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

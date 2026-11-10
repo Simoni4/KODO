@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-display: 'Fredoka', 'Outfit', sans-serif;
+    --font-sans: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  }
+  
+  body {
+    font-family: var(--font-sans);
+    background-color: #0b1528;
+    color: #f1f5f9;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    overflow: hidden;
+  }
+}
+
+/* Custom winter glow & casual button styles */
+.text-shadow-game {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(15, 23, 42, 0.5);
+}
+
+.text-stroke-thick {
+  -webkit-text-stroke: 2px #1e293b;
+  paint-order: stroke fill;
+}
+
+.text-stroke-title {
+  -webkit-text-stroke: 4px #0f172a;
+  paint-order: stroke fill;
+}
+
+/* Prevent image dragging */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
