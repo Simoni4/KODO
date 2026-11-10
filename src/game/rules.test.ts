@@ -301,6 +301,20 @@ test('AI Race uses a longer 18x18 symmetric arena with equal legal routes', () =
   }
 });
 
+test('AI Race contains winding routes and isolated cliffs that cannot be jumped onto', () => {
+  const arena = generateFairRaceArena(18);
+  assert.ok(isRaceArenaFair(arena));
+  assert.ok(arena.grid.some((row) => row.some((height) => height === 5)), 'Generated map should contain tall cliff walls');
+  const isWalkable = (x: number, y: number) =>
+    x >= 0 && x < arena.size && y >= 0 && y < arena.size && arena.grid[y][x] > 0;
+  const canStep = (fromX: number, fromY: number, toX: number, toY: number) =>
+    isWalkable(fromX, fromY) && isWalkable(toX, toY) &&
+    Math.abs(arena.grid[fromY][fromX] - arena.grid[toY][toX]) <= 1;
+  const route = bfsShortestPath(arena.spawns[0], arena.finish, isWalkable, arena.size, arena.size, canStep);
+  assert.ok(route && route.length >= 16, 'Race route should require at least 16 moves');
+  assert.ok(route?.some((point) => arena.grid[point.y][point.x] === 3), 'Route should include elevated platforms');
+});
+
 test('Procedural Survival Arena generates 14x14 4-fold symmetric 3D board with safe symmetric spawns', () => {
   for (let run = 0; run < 10; run++) {
     const { tiles, players } = initSurvivalArena(14);
@@ -326,6 +340,22 @@ test('Procedural Survival Arena generates 14x14 4-fold symmetric 3D board with s
       }
     }
   }
+});
+
+test('Survival arena has a permanent high perimeter and safe inner spawn pads', () => {
+  const { tiles, players } = initSurvivalArena(14);
+  for (const player of players) {
+    const spawn = tiles.get(`${player.x},${player.y}`);
+    assert.ok(spawn && spawn.state === 'stable');
+    assert.equal(spawn?.elevation, 0);
+  }
+  for (let i = 2; i <= 11; i++) {
+    assert.equal(tiles.get(`${i},1`)?.elevation, 3);
+    assert.equal(tiles.get(`${i},12`)?.elevation, 3);
+    assert.equal(tiles.get(`1,${i}`)?.elevation, 3);
+    assert.equal(tiles.get(`12,${i}`)?.elevation, 3);
+  }
+  assert.ok(Array.from(tiles.values()).some((tile) => tile.elevation === 1 || tile.elevation === 2));
 });
 
 test('Crate pushing and Survival push physics work accurately', () => {
