@@ -119,6 +119,13 @@ export default function App() {
     }
   }, []);
 
+  // Play a tick for 3, 2, 1 and a distinct signal when the round starts.
+  useEffect(() => {
+    if (screen !== 'playing' || countdown === null) return;
+    if (countdown === 0) KodoAudioManager.playRaceStart();
+    else KodoAudioManager.playCountdownTick();
+  }, [screen, countdown]);
+
   // Three-second ready countdown before every new round or restart.
   useEffect(() => {
     if (screen !== 'playing' || countdown === null) return;
@@ -425,10 +432,10 @@ export default function App() {
 
       {/* Ready countdown shown above every game mode */}
       {screen === 'playing' && countdown !== null && (
-        <div className="absolute inset-x-0 top-5 z-40 flex justify-center pointer-events-none">
+        <div className="absolute inset-x-0 top-20 sm:top-24 z-40 flex justify-center pointer-events-none">
           <div className="flex flex-col items-center justify-center">
-            <span className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-100/90 drop-shadow-[0_2px_5px_rgba(15,23,42,0.9)]">Get Ready</span>
-            <span key={countdown} className="mt-0.5 text-4xl font-black tabular-nums leading-none text-white drop-shadow-[0_2px_10px_rgba(14,165,233,0.9)] animate-pulse">
+            <span className="rounded-full border border-sky-200/40 bg-slate-950/65 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-sky-100 shadow-lg backdrop-blur-sm">Get Ready</span>
+            <span key={countdown} className="mt-1 text-5xl font-black tabular-nums leading-none text-white drop-shadow-[0_3px_14px_rgba(14,165,233,1)] animate-pulse">
               {countdown === 0 ? 'GO!' : countdown}
             </span>
           </div>
