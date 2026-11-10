@@ -1,10 +1,10 @@
 import React from 'react';
-import { Settings, Play, Trophy, Sparkles } from 'lucide-react';
+import { Settings, Play, Sparkles, Palette } from 'lucide-react';
 import { KodoHeroMascot } from './KodoHeroMascot';
 
 interface TitleScreenProps {
   onPlay: () => void;
-  onOpenLevels: () => void;
+  onOpenCustomize: () => void;
   onOpenSettings: () => void;
 }
 
@@ -25,7 +25,7 @@ export const GAMEPLAY_THEMES = [
 
 export const TitleScreen: React.FC<TitleScreenProps> = ({
   onPlay,
-  onOpenLevels,
+  onOpenCustomize,
   onOpenSettings,
 }) => {
   return (
@@ -66,14 +66,14 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
             </span>
           </button>
 
-          {/* LEVELS Button */}
+          {/* Character customization */}
           <button
-            onClick={onOpenLevels}
-            aria-label="Select Level"
-            className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-gradient-to-b from-sky-600 to-blue-800 hover:from-sky-500 hover:to-blue-700 border-2 border-sky-300/60 shadow-lg active:scale-95 text-white font-bold text-sm uppercase tracking-wide transition-all cursor-pointer"
+            onClick={onOpenCustomize}
+            aria-label="Customize character"
+            className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-gradient-to-b from-violet-600 to-indigo-800 hover:from-violet-500 hover:to-indigo-700 border-2 border-violet-300/60 shadow-lg active:scale-95 text-white font-bold text-sm uppercase tracking-wide transition-all cursor-pointer"
           >
-            <Trophy className="w-4 h-4 text-amber-300" />
-            <span>Levels (18)</span>
+            <Palette className="w-4 h-4 text-amber-200" />
+            <span>Customize Kodo</span>
           </button>
         </div>
       </div>
