@@ -231,8 +231,8 @@ export const RaceView: React.FC<RaceViewProps> = ({
         const updated = prevBots.map((bot) => {
           if (!bot.alive) return bot;
 
-          const moveChance =
-            bot.personality === 'aggressive' ? 0.82 : bot.personality === 'tricky' ? 0.75 : 0.68;
+          // All racers use the same movement cadence; personality must not grant a speed advantage.
+          const moveChance = 0.76;
           if (Math.random() > moveChance) return bot;
 
           const path = bfsShortestPath(
@@ -307,18 +307,29 @@ export const RaceView: React.FC<RaceViewProps> = ({
 
   // Rank calculation
   useEffect(() => {
-    const distToCenter = (p: Point) =>
-      Math.abs(p.x - arena.finish.x) + Math.abs(p.y - arena.finish.y);
+    // Rank by the actual legal route, not Manhattan distance through holes or cliffs.
+    const distToFinish = (position: Point) => {
+      const path = bfsShortestPath(
+        position,
+        arena.finish,
+        isCellWalkableSync,
+        arena.size,
+        arena.size,
+        (fromX, fromY, toX, toY) =>
+          canStepBetweenSync(fromX, fromY, toX, toY)
+      );
+      return path ? path.length : Number.POSITIVE_INFINITY;
+    };
 
-    const playerDist = distToCenter(playerPos);
+    const playerDist = distToFinish(playerPos);
     let rank = 1;
     for (const b of bots) {
-      if (distToCenter({ x: b.x, y: b.y }) < playerDist) {
+      if (distToFinish({ x: b.x, y: b.y }) < playerDist) {
         rank++;
       }
     }
     onRankChange?.(rank);
-  }, [playerPos, bots, arena.finish, onRankChange]);
+  }, [playerPos, bots, arena.finish, arena.size, onRankChange, isCellWalkableSync, canStepBetweenSync]);
 
   // Stable 60fps Render Loop
   useEffect(() => {
