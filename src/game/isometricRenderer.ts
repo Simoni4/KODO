@@ -40,32 +40,33 @@ export class IsometricRenderer {
     rows: number
   ): { originX: number; originY: number } {
     const maxDim = Math.max(cols, rows);
+    let preferredTileW: number;
     if (maxDim <= 7) {
-      this.tileW = 70;
-      this.tileH = 35;
-      this.blockDepth = 20;
-      this.elevationStep = 20;
+      preferredTileW = 70;
     } else if (maxDim <= 9) {
-      this.tileW = 60;
-      this.tileH = 30;
-      this.blockDepth = 18;
-      this.elevationStep = 18;
+      preferredTileW = 60;
     } else if (maxDim <= 11) {
-      this.tileW = 54;
-      this.tileH = 27;
-      this.blockDepth = 16;
-      this.elevationStep = 16;
+      preferredTileW = 54;
     } else {
-      this.tileW = 48;
-      this.tileH = 24;
-      this.blockDepth = 15;
-      this.elevationStep = 15;
+      preferredTileW = 48;
     }
+
+    // Fit the complete isometric footprint to the canvas instead of allowing
+    // wide procedural maps (especially 18x18 Race) to clip at the left/right edges.
+    const horizontalSteps = Math.max(1, cols + rows - 2);
+    const verticalSteps = Math.max(1, cols + rows - 2);
+    const widthFit = (canvasWidth - 48) * 2 / horizontalSteps;
+    const heightFit = (canvasHeight - 150) * 2 / verticalSteps;
+    this.tileW = Math.max(28, Math.min(preferredTileW, widthFit, heightFit));
+    this.tileH = this.tileW * 0.5;
+    this.blockDepth = this.tileW * 0.3125;
+    this.elevationStep = this.tileW * 0.3125;
 
     const centerCol = (cols - 1) / 2;
     const centerRow = (rows - 1) / 2;
     const originX = canvasWidth / 2 - (centerCol - centerRow) * (this.tileW / 2);
-    const originY = canvasHeight / 2 - (centerCol + centerRow) * (this.tileH / 2) + 10;
+    const projectedHeight = (centerCol + centerRow) * (this.tileH / 2);
+    const originY = canvasHeight / 2 - projectedHeight + 10;
 
     return { originX, originY };
   }
