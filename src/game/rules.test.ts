@@ -301,10 +301,11 @@ test('AI Race uses a longer 18x18 symmetric arena with equal legal routes', () =
   }
 });
 
-test('AI Race contains winding routes and isolated cliffs that cannot be jumped onto', () => {
+test('AI Race contains winding routes and moderate-height obstacles without giant cliffs', () => {
   const arena = generateFairRaceArena(18);
   assert.ok(isRaceArenaFair(arena));
-  assert.ok(arena.grid.some((row) => row.some((height) => height === 5)), 'Generated map should contain tall cliff walls');
+  assert.ok(arena.grid.some((row) => row.some((height) => height === 3)), 'Generated map should contain raised blocks');
+  assert.ok(arena.grid.every((row) => row.every((height) => height <= 3)), 'No screen-filling cliff heights');
   const isWalkable = (x: number, y: number) =>
     x >= 0 && x < arena.size && y >= 0 && y < arena.size && arena.grid[y][x] > 0;
   const canStep = (fromX: number, fromY: number, toX: number, toY: number) =>
@@ -342,20 +343,20 @@ test('Procedural Survival Arena generates 14x14 4-fold symmetric 3D board with s
   }
 });
 
-test('Survival arena has a permanent high perimeter and safe inner spawn pads', () => {
-  const { tiles, players } = initSurvivalArena(14);
+test('Survival arena has a low open-front enclosure and safe inner spawn pads', () => {
+  const { tiles, players } = initSurvivalArena(18);
   for (const player of players) {
     const spawn = tiles.get(`${player.x},${player.y}`);
     assert.ok(spawn && spawn.state === 'stable');
     assert.equal(spawn?.elevation, 0);
   }
-  for (let i = 2; i <= 11; i++) {
-    assert.equal(tiles.get(`${i},1`)?.elevation, 3);
-    assert.equal(tiles.get(`${i},12`)?.elevation, 3);
-    assert.equal(tiles.get(`1,${i}`)?.elevation, 3);
-    assert.equal(tiles.get(`12,${i}`)?.elevation, 3);
+  for (let i = 2; i <= 15; i++) {
+    assert.equal(tiles.get(`${i},2`)?.elevation, 2, 'Rear rim should be low');
+    assert.equal(tiles.get(`2,${i}`)?.elevation, 2, 'Left rim should be low');
+    assert.equal(tiles.get(`15,${i}`)?.elevation, 2, 'Right rim should be low');
   }
-  assert.ok(Array.from(tiles.values()).some((tile) => tile.elevation === 1 || tile.elevation === 2));
+  assert.equal(tiles.has('8,15'), true, 'Front side should remain open for visibility');
+  assert.ok(Array.from(tiles.values()).some((tile) => tile.elevation === 1));
 });
 
 test('Crate pushing and Survival push physics work accurately', () => {
