@@ -335,3 +335,26 @@ test('BFS rejects unreachable or non-walkable targets instead of routing through
     null
   );
 });
+
+
+test('BFS supports fair shortest-route personality preferences', () => {
+  const isWalkable = (x: number, y: number) =>
+    x >= 0 && x < 2 && y >= 0 && y < 2;
+  const start = { x: 0, y: 0 };
+  const finish = { x: 1, y: 1 };
+
+  const defaultPath = bfsShortestPath(start, finish, isWalkable, 2, 2);
+  const preferredPath = bfsShortestPath(
+    start,
+    finish,
+    isWalkable,
+    2,
+    2,
+    undefined,
+    [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 0, y: -1 }]
+  );
+
+  assert.equal(defaultPath?.length, 2);
+  assert.equal(preferredPath?.length, 2);
+  assert.deepEqual(preferredPath?.[0], { x: 1, y: 0 });
+});
