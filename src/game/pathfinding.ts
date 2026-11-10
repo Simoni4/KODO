@@ -5,7 +5,8 @@ export function bfsShortestPath(
   target: Point,
   isWalkable: (x: number, y: number) => boolean,
   width: number,
-  height: number
+  height: number,
+  canTraverse?: (fromX: number, fromY: number, toX: number, toY: number) => boolean
 ): Point[] | null {
   if (start.x === target.x && start.y === target.y) {
     return [];
@@ -49,7 +50,12 @@ export function bfsShortestPath(
         !visited.has(nextKey)
       ) {
         // Can walk if isWalkable is true or if it is the target itself
-        if (isWalkable(nx, ny) || (nx === target.x && ny === target.y)) {
+        const destinationIsWalkable = isWalkable(nx, ny) || (nx === target.x && ny === target.y);
+        const movementIsValid = canTraverse
+          ? canTraverse(current.x, current.y, nx, ny)
+          : true;
+
+        if (destinationIsWalkable && movementIsValid) {
           visited.add(nextKey);
           parent.set(nextKey, current);
           queue.push(nextPoint);
