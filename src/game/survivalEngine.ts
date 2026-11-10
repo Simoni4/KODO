@@ -25,11 +25,11 @@ const rotateArenaPoint = (x: number, y: number, size: number): Point => ({
 });
 
 /**
- * Builds a compact enclosed survival arena. A high, continuous perimeter wall
- * surrounds a lower play floor, with randomized symmetric platforms and gaps.
- * The four spawn pads are always safe, stable and at the same elevation.
+ * Creates a spacious 18x18 survival arena. The rear and side rims are low,
+ * while the front edge is deliberately open so the camera never looks through
+ * a tall foreground wall. Raised pads are small and distributed around the floor.
  */
-export function initSurvivalArena(size: number = 14): {
+export function initSurvivalArena(size: number = 18): {
   tiles: Map<string, SurvivalTileState>;
   players: SurvivalEntity[];
   archetypeName: string;
@@ -55,7 +55,7 @@ export function initSurvivalArena(size: number = 14): {
   };
 
   const archetypes = [
-    'Frostwall Colosseum',
+    'Open Frost Colosseum',
     'Four-Pad Arena',
     'Broken Ice Courtyard',
     'Stepping-Stone Bowl',
@@ -63,45 +63,41 @@ export function initSurvivalArena(size: number = 14): {
   const archetypeIdx = Math.floor(Math.random() * archetypes.length);
   const archetypeName = archetypes[archetypeIdx];
 
-  // Flat interior floor with a thick, unjumpable perimeter wall.
-  // Wall elevation 3 cannot be entered from the floor (height difference > 1).
-  for (let y = 1; y < size - 1; y++) {
-    for (let x = 1; x < size - 1; x++) {
-      const isWall = x === 1 || y === 1 || x === size - 2 || y === size - 2;
-      setTile(x, y, isWall ? 3 : 0);
+  // Broad, flat play floor. The rear and side rims are only two levels high;
+  // the near/front rim is omitted to preserve an unobstructed view of every bird.
+  for (let y = 2; y <= size - 2; y++) {
+    for (let x = 2; x <= size - 2; x++) {
+      const isRearOrSideRim = y === 2 || x === 2 || x === size - 3;
+      setTile(x, y, isRearOrSideRim ? 2 : 0);
     }
   }
 
-  // Arena-specific platform layouts. These are deliberately distributed around
-  // the arena instead of always building a raised tower in the center.
+  // Four distinct but compact layouts, with a low center and no tall central tower.
   if (archetypeIdx === 0) {
-    // Four short corner terraces and a low center.
-    for (const [x, y] of [[4, 4], [9, 4], [9, 9], [4, 9]]) setSymmetric(x, y, 1);
-    setSymmetric(6, 4, 1);
-    setSymmetric(4, 6, 1);
+    for (const [x, y] of [[5, 5], [12, 5], [12, 12], [5, 12]]) setSymmetric(x, y, 1);
+    setSymmetric(7, 5, 1);
+    setSymmetric(5, 7, 1);
   } else if (archetypeIdx === 1) {
-    // Four separated raised pads, leaving wide lanes between them.
-    for (const [x, y] of [[4, 5], [5, 5], [5, 4]]) setSymmetric(x, y, 1);
-    setSymmetric(6, 6, 2);
+    for (const [x, y] of [[5, 7], [6, 7], [6, 6]]) setSymmetric(x, y, 1);
+    setSymmetric(8, 8, 2);
   } else if (archetypeIdx === 2) {
-    // A broken ring: gaps and small elevated islands, no central tower.
-    for (let i = 4; i <= 9; i++) {
-      setSymmetric(4, i, i % 2 === 0 ? 1 : 0);
+    for (let i = 5; i <= 12; i++) {
+      if (i % 2 === 0) setSymmetric(5, i, 1);
     }
-    removeSymmetric(6, 6);
-    removeSymmetric(6, 7);
+    removeSymmetric(7, 7);
+    removeSymmetric(7, 8);
   } else {
-    // Alternating stepping stones along the four sides.
-    for (const [x, y] of [[3, 6], [4, 6], [5, 7], [6, 8], [7, 9]]) {
+    for (const [x, y] of [[4, 8], [5, 8], [6, 9], [7, 10], [8, 11]]) {
       setSymmetric(x, y, 1);
     }
-    setSymmetric(6, 6, 0);
+    setSymmetric(8, 8, 0);
   }
 
-  // Random symmetric gaps and isolated raised obstacles make each arena different.
+  // A few random holes and small raised blocks create changing routes without
+  // filling the arena with high obstacles.
   const gapCandidates: Point[] = [
-    { x: 3, y: 3 }, { x: 3, y: 7 }, { x: 4, y: 8 },
-    { x: 5, y: 3 }, { x: 5, y: 9 }, { x: 7, y: 4 },
+    { x: 4, y: 4 }, { x: 4, y: 8 }, { x: 5, y: 10 },
+    { x: 6, y: 4 }, { x: 7, y: 12 }, { x: 9, y: 5 },
   ];
   const shuffledGaps = [...gapCandidates].sort(() => Math.random() - 0.5);
   for (const point of shuffledGaps.slice(0, 1 + Math.floor(Math.random() * 3))) {
@@ -109,15 +105,20 @@ export function initSurvivalArena(size: number = 14): {
   }
 
   const obstacleCandidates: Point[] = [
-    { x: 3, y: 5 }, { x: 4, y: 7 }, { x: 5, y: 8 }, { x: 7, y: 5 },
+    { x: 4, y: 6 }, { x: 5, y: 9 }, { x: 7, y: 11 }, { x: 9, y: 7 },
   ];
   for (const point of obstacleCandidates) {
-    if (Math.random() < 0.35) setSymmetric(point.x, point.y, 3);
+    if (Math.random() < 0.3) setSymmetric(point.x, point.y, 2);
   }
 
-  // Four equal spawn pads and their cardinal neighbours are guaranteed safe.
+  // Spawn pads sit well inside the arena, with a clear first move in every direction.
+  const low = Math.floor(size / 2) - 3;
+  const high = size - 1 - low;
   const spawnPads: Point[] = [
-    { x: 4, y: 9 }, { x: 9, y: 9 }, { x: 9, y: 4 }, { x: 4, y: 4 },
+    { x: low, y: high },
+    { x: high, y: high },
+    { x: high, y: low },
+    { x: low, y: low },
   ];
   for (const spawn of spawnPads) {
     setTile(spawn.x, spawn.y, 0);
