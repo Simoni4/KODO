@@ -20,7 +20,7 @@ export const RaceView: React.FC<RaceViewProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rendererRef = useRef<IsometricRenderer>(new IsometricRenderer());
 
-  const initialArenaRef = useRef<RaceArena>(generateFairRaceArena(14));
+  const initialArenaRef = useRef<RaceArena>(generateFairRaceArena(18));
   const [arena, setArena] = useState<RaceArena>(() => initialArenaRef.current);
   const [playerPos, setPlayerPos] = useState<Point>(() => initialArenaRef.current.spawns[0]);
   const [playerFacing, setPlayerFacing] = useState<'left' | 'right' | 'front'>('front');
@@ -86,7 +86,7 @@ export const RaceView: React.FC<RaceViewProps> = ({
   }, [isPaused]);
 
   useEffect(() => {
-    const newArena = generateFairRaceArena(14);
+    const newArena = generateFairRaceArena(18);
     const freshBots = createInitialBots(newArena);
     arenaRef.current = newArena;
     playerPosRef.current = newArena.spawns[0];
