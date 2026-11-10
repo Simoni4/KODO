@@ -32,7 +32,7 @@ function createComplexRaceCandidate(): RaceArena {
     { x: 7, y: 11 }, { x: 7, y: 10 }, { x: 7, y: 9 },
     { x: 8, y: 9 }, { x: 8, y: 8 },
   ];
-  const elevations = [0, 0, 0, 1, 1, 0, 0, 1, 2, 2, 1, 0, 1, 2, 1, 0, 0];
+  const elevations = [0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0];
 
   for (let rotation = 0; rotation < 4; rotation++) {
     route.forEach((point, index) => {
@@ -41,8 +41,8 @@ function createComplexRaceCandidate(): RaceArena {
     });
   }
 
-  // Procedural, rotationally symmetric cliff clusters. Height 5 is intentionally
-  // unreachable from the lower race lanes (height difference > 1), creating real walls.
+  // Low, rotationally symmetric obstacle clusters. Keep them at the same
+  // maximum elevation as the route so they never become tall visual barriers.
   const wallCandidates: Point[] = [
     { x: 2, y: 10 }, { x: 2, y: 11 }, { x: 3, y: 10 },
     { x: 4, y: 12 }, { x: 4, y: 13 }, { x: 6, y: 13 },
@@ -50,13 +50,13 @@ function createComplexRaceCandidate(): RaceArena {
     { x: 3, y: 7 }, { x: 4, y: 7 }, { x: 6, y: 6 },
   ];
   const shuffled = [...wallCandidates].sort(() => Math.random() - 0.5);
-  const wallCount = 5 + Math.floor(Math.random() * 4);
+  const wallCount = 3 + Math.floor(Math.random() * 3);
   let placed = 0;
   for (const candidate of shuffled) {
     if (placed >= wallCount) break;
     const orbit = [0, 1, 2, 3].map((turn) => rotatePoint(candidate, turn));
     if (orbit.some((p) => grid[p.y][p.x] > 0)) continue;
-    for (const p of orbit) grid[p.y][p.x] = 3;
+    for (const p of orbit) grid[p.y][p.x] = 2;
     placed++;
   }
 
@@ -69,7 +69,7 @@ function createComplexRaceCandidate(): RaceArena {
     if (Math.random() > 0.45) continue;
     for (let turn = 0; turn < 4; turn++) {
       const p = rotatePoint(candidate, turn);
-      if (grid[p.y][p.x] === 0) grid[p.y][p.x] = 3;
+      if (grid[p.y][p.x] === 0) grid[p.y][p.x] = 2;
     }
   }
 
@@ -145,7 +145,7 @@ export function isRaceArenaFair(arena: RaceArena): boolean {
 }
 
 /**
- * Creates a winding, multi-height race course with inaccessible cliff walls.
+ * Creates a winding, multi-height race course with low, visibility-friendly obstacles.
  * Re-rolls candidates until all four lanes have identical legal route lengths.
  */
 export function generateFairRaceArena(size: number = 14): RaceArena {
