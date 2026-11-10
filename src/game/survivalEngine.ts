@@ -15,14 +15,19 @@ export interface SurvivalTileState {
   x: number;
   y: number;
   state: 'stable' | 'warning' | 'crumbled';
-  elevation: number; // 0 = base ice block, 1 = elevated plateau (+1 block up)
+  elevation: number;
   warningExpiresAt?: number;
 }
 
+const rotateArenaPoint = (x: number, y: number, size: number): Point => ({
+  x: y,
+  y: size - 1 - x,
+});
+
 /**
- * Generates a procedural 4-fold rotationally symmetric Survival Arena.
- * Every contestant spawns at an identical symmetric position with zero advantage.
- * Supports 2-tier 3D elevations (0 and 1) so players can hop 1 block up & 1 block down.
+ * Builds a compact enclosed survival arena. A high, continuous perimeter wall
+ * surrounds a lower play floor, with randomized symmetric platforms and gaps.
+ * The four spawn pads are always safe, stable and at the same elevation.
  */
 export function initSurvivalArena(size: number = 14): {
   tiles: Map<string, SurvivalTileState>;
@@ -30,138 +35,103 @@ export function initSurvivalArena(size: number = 14): {
   archetypeName: string;
 } {
   const tiles = new Map<string, SurvivalTileState>();
-
-  // 4-fold rotational symmetry helper around the (size x size) grid
-  const setSymmetricTile = (x: number, y: number, elevation: number = 0) => {
-    const coords: [number, number][] = [
-      [x, y],
-      [y, size - 1 - x],
-      [size - 1 - x, size - 1 - y],
-      [size - 1 - y, x],
-    ];
-    for (const [cx, cy] of coords) {
-      if (cx >= 0 && cx < size && cy >= 0 && cy < size) {
-        tiles.set(`${cx},${cy}`, {
-          x: cx,
-          y: cy,
-          state: 'stable',
-          elevation,
-        });
-      }
+  const setTile = (x: number, y: number, elevation = 0) => {
+    if (x < 0 || y < 0 || x >= size || y >= size) return;
+    tiles.set(`${x},${y}`, { x, y, state: 'stable', elevation });
+  };
+  const setSymmetric = (x: number, y: number, elevation = 0) => {
+    let point = { x, y };
+    for (let turn = 0; turn < 4; turn++) {
+      setTile(point.x, point.y, elevation);
+      point = rotateArenaPoint(point.x, point.y, size);
     }
   };
-
-  const removeSymmetricTile = (x: number, y: number) => {
-    const coords: [number, number][] = [
-      [x, y],
-      [y, size - 1 - x],
-      [size - 1 - x, size - 1 - y],
-      [size - 1 - y, x],
-    ];
-    for (const [cx, cy] of coords) {
-      tiles.delete(`${cx},${cy}`);
+  const removeSymmetric = (x: number, y: number) => {
+    let point = { x, y };
+    for (let turn = 0; turn < 4; turn++) {
+      tiles.delete(`${point.x},${point.y}`);
+      point = rotateArenaPoint(point.x, point.y, size);
     }
   };
 
   const archetypes = [
-    'Octagon Frost Citadel',
-    'Four Islands Fortress',
-    'Colosseum Ice Ring',
-    'Starlight Cross Sanctuary',
+    'Frostwall Colosseum',
+    'Four-Pad Arena',
+    'Broken Ice Courtyard',
+    'Stepping-Stone Bowl',
   ];
   const archetypeIdx = Math.floor(Math.random() * archetypes.length);
   const archetypeName = archetypes[archetypeIdx];
 
-  // Base octagon canvas (clips extreme corners symmetrically)
+  // Flat interior floor with a thick, unjumpable perimeter wall.
+  // Wall elevation 3 cannot be entered from the floor (height difference > 1).
   for (let y = 1; y < size - 1; y++) {
     for (let x = 1; x < size - 1; x++) {
-      const distCorner =
-        Math.min(x, size - 1 - x) + Math.min(y, size - 1 - y);
-      if (distCorner >= 3) {
-        setSymmetricTile(x, y, 0);
-      }
+      const isWall = x === 1 || y === 1 || x === size - 2 || y === size - 2;
+      setTile(x, y, isWall ? 3 : 0);
     }
   }
 
-  // Apply procedural symmetric variations based on archetype
+  // Arena-specific platform layouts. These are deliberately distributed around
+  // the arena instead of always building a raised tower in the center.
   if (archetypeIdx === 0) {
-    // Octagon Frost Citadel: Elevated central plateau (elevation 1) with symmetric holes
-    for (let y = 5; y <= 8; y++) {
-      for (let x = 5; x <= 8; x++) {
-        setSymmetricTile(x, y, 1);
-      }
-    }
-    // Random symmetric corner pillars or gaps
-    if (Math.random() > 0.4) {
-      setSymmetricTile(4, 6, 1);
-      setSymmetricTile(6, 4, 1);
-    }
-    if (Math.random() > 0.5) {
-      removeSymmetricTile(2, 6);
-    }
+    // Four short corner terraces and a low center.
+    for (const [x, y] of [[4, 4], [9, 4], [9, 9], [4, 9]]) setSymmetric(x, y, 1);
+    setSymmetric(6, 4, 1);
+    setSymmetric(4, 6, 1);
   } else if (archetypeIdx === 1) {
-    // Four Islands Fortress: 4 corner islands connected by wide bridges to a raised center
-    for (let i = 1; i <= 2; i++) {
-      removeSymmetricTile(6, 1 + i);
-      removeSymmetricTile(7, 1 + i);
-    }
-    for (let y = 5; y <= 8; y++) {
-      for (let x = 5; x <= 8; x++) {
-        setSymmetricTile(x, y, 1);
-      }
-    }
-    // Symmetric raised ridges on each quadrant
-    setSymmetricTile(3, 9, 1);
-    setSymmetricTile(4, 9, 1);
+    // Four separated raised pads, leaving wide lanes between them.
+    for (const [x, y] of [[4, 5], [5, 5], [5, 4]]) setSymmetric(x, y, 1);
+    setSymmetric(6, 6, 2);
   } else if (archetypeIdx === 2) {
-    // Colosseum Ice Ring: Raised outer ring terraces with central pit / bridges
-    removeSymmetricTile(6, 6);
-    for (let d = 4; d <= 9; d++) {
-      setSymmetricTile(4, d, 1);
+    // A broken ring: gaps and small elevated islands, no central tower.
+    for (let i = 4; i <= 9; i++) {
+      setSymmetric(4, i, i % 2 === 0 ? 1 : 0);
     }
-    // Ensure step-up access from spawn (3, 10) -> (3, 9) -> (4, 9)
-    setSymmetricTile(3, 10, 0);
-    setSymmetricTile(3, 9, 0);
-    setSymmetricTile(5, 6, 0);
+    removeSymmetric(6, 6);
+    removeSymmetric(6, 7);
   } else {
-    // Starlight Cross Sanctuary: Cross-shaped central high ground + symmetric side pockets
-    removeSymmetricTile(2, 2);
-    removeSymmetricTile(2, 3);
-    removeSymmetricTile(3, 2);
-    for (let k = 4; k <= 9; k++) {
-      setSymmetricTile(6, k, 1);
-      setSymmetricTile(7, k, 1);
+    // Alternating stepping stones along the four sides.
+    for (const [x, y] of [[3, 6], [4, 6], [5, 7], [6, 8], [7, 9]]) {
+      setSymmetric(x, y, 1);
     }
+    setSymmetric(6, 6, 0);
   }
 
-  // Add 1-2 extra procedural symmetric feature tweaks so no two matches are identical
-  const randFeature = Math.floor(Math.random() * 3);
-  if (randFeature === 0) {
-    setSymmetricTile(4, 8, 1);
-  } else if (randFeature === 1) {
-    setSymmetricTile(5, 9, 1);
-  } else {
-    removeSymmetricTile(1, 5);
-  }
-
-  // Guarantee the 4 symmetric spawn pads and their immediate neighbors are always stable & walkable
-  const baseSpawn = { x: 3, y: 10 };
-  const spawnNeighborhood: [number, number][] = [
-    [baseSpawn.x, baseSpawn.y],
-    [baseSpawn.x + 1, baseSpawn.y],
-    [baseSpawn.x, baseSpawn.y - 1],
-    [baseSpawn.x + 1, baseSpawn.y - 1],
+  // Random symmetric gaps and isolated raised obstacles make each arena different.
+  const gapCandidates: Point[] = [
+    { x: 3, y: 3 }, { x: 3, y: 7 }, { x: 4, y: 8 },
+    { x: 5, y: 3 }, { x: 5, y: 9 }, { x: 7, y: 4 },
   ];
-  for (const [sx, sy] of spawnNeighborhood) {
-    setSymmetricTile(sx, sy, 0);
+  const shuffledGaps = [...gapCandidates].sort(() => Math.random() - 0.5);
+  for (const point of shuffledGaps.slice(0, 1 + Math.floor(Math.random() * 3))) {
+    removeSymmetric(point.x, point.y);
   }
 
-  // 4 contestants: Player + 3 Bots at exact 90-degree rotational symmetry
+  const obstacleCandidates: Point[] = [
+    { x: 3, y: 5 }, { x: 4, y: 7 }, { x: 5, y: 8 }, { x: 7, y: 5 },
+  ];
+  for (const point of obstacleCandidates) {
+    if (Math.random() < 0.35) setSymmetric(point.x, point.y, 3);
+  }
+
+  // Four equal spawn pads and their cardinal neighbours are guaranteed safe.
+  const spawnPads: Point[] = [
+    { x: 4, y: 9 }, { x: 9, y: 9 }, { x: 9, y: 4 }, { x: 4, y: 4 },
+  ];
+  for (const spawn of spawnPads) {
+    setTile(spawn.x, spawn.y, 0);
+    setTile(spawn.x + 1, spawn.y, 0);
+    setTile(spawn.x - 1, spawn.y, 0);
+    setTile(spawn.x, spawn.y + 1, 0);
+    setTile(spawn.x, spawn.y - 1, 0);
+  }
+
   const players: SurvivalEntity[] = [
-    { id: 'player', name: 'Kodo', x: 3, y: 10, isPlayer: true, color: '#38bdf8', alive: true },
-    { id: 'bot1', name: 'Frosty', x: 10, y: 10, isPlayer: false, color: '#f87171', alive: true },
-    { id: 'bot2', name: 'Blizzard', x: 10, y: 3, isPlayer: false, color: '#c084fc', alive: true },
-    { id: 'bot3', name: 'Pipsqueak', x: 3, y: 3, isPlayer: false, color: '#facc15', alive: true },
+    { id: 'player', name: 'Kodo', x: spawnPads[0].x, y: spawnPads[0].y, isPlayer: true, color: '#38bdf8', alive: true },
+    { id: 'bot1', name: 'Frosty', x: spawnPads[1].x, y: spawnPads[1].y, isPlayer: false, color: '#f87171', alive: true },
+    { id: 'bot2', name: 'Blizzard', x: spawnPads[2].x, y: spawnPads[2].y, isPlayer: false, color: '#c084fc', alive: true },
+    { id: 'bot3', name: 'Pipsqueak', x: spawnPads[3].x, y: spawnPads[3].y, isPlayer: false, color: '#facc15', alive: true },
   ];
 
   return { tiles, players, archetypeName };
@@ -176,10 +146,8 @@ export function processPush(
 ): { pushedTo: Point; fell: boolean } {
   const targetX = victimPos.x + dx;
   const targetY = victimPos.y + dy;
-
   if (!isCellWalkable(targetX, targetY)) {
     return { pushedTo: { x: targetX, y: targetY }, fell: true };
   }
-
   return { pushedTo: { x: targetX, y: targetY }, fell: false };
 }
