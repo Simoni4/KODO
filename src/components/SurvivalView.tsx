@@ -470,6 +470,7 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
       }
 
       // 2. Characters (100% Vector Kodo Birds)
+      let playerIndicator: { position: { x: number; y: number }; direction: 'up' | 'right' | 'down' | 'left'; elevationDiff: number } | null = null;
       for (const p of currentPlayers) {
         if (!p.alive) continue;
         const pElev = getTileElevationSync(p.x, p.y);
@@ -487,12 +488,7 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
             targetTile && targetTile.state !== 'crumbled' ? targetTile.elevation || 0 : pElev;
           const elevDiff = targetElev - pElev;
 
-          drawables.push({
-            sortKey: (p.x + p.y) * 10 + 4,
-            draw: () => {
-              renderer.drawDirectionalIndicator(ctx, pIso, activeDir, animTime, elevDiff);
-            },
-          });
+          playerIndicator = { position: pIso, direction: activeDir, elevationDiff: elevDiff };
         }
 
         drawables.push({
@@ -537,6 +533,17 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
 
       drawables.sort((a, b) => a.sortKey - b.sortKey);
       for (const d of drawables) d.draw();
+
+      // Render the active direction after the terrain so foreground blocks never hide it.
+      if (playerIndicator) {
+        renderer.drawDirectionalIndicator(
+          ctx,
+          playerIndicator.position,
+          playerIndicator.direction,
+          animTime,
+          playerIndicator.elevationDiff
+        );
+      }
 
       renderer.renderParticles(ctx);
 
