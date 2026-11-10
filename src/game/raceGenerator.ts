@@ -56,12 +56,11 @@ function createComplexRaceCandidate(): RaceArena {
     if (placed >= wallCount) break;
     const orbit = [0, 1, 2, 3].map((turn) => rotatePoint(candidate, turn));
     if (orbit.some((p) => grid[p.y][p.x] > 0)) continue;
-    for (const p of orbit) grid[p.y][p.x] = 5;
+    for (const p of orbit) grid[p.y][p.x] = 3;
     placed++;
   }
 
-  // Low side ledges and isolated stepping-stone platforms add visual variety without
-  // connecting the four lanes or making the high cliff tops reachable from the track.
+  // Low side ledges and modest raised platforms add visual variety while keeping racers visible.
   const ledgeCandidates: Point[] = [
     { x: 2, y: 8 }, { x: 3, y: 8 }, { x: 4, y: 9 },
     { x: 4, y: 10 }, { x: 6, y: 8 }, { x: 6, y: 10 },
@@ -70,7 +69,7 @@ function createComplexRaceCandidate(): RaceArena {
     if (Math.random() > 0.45) continue;
     for (let turn = 0; turn < 4; turn++) {
       const p = rotatePoint(candidate, turn);
-      if (grid[p.y][p.x] === 0) grid[p.y][p.x] = 5;
+      if (grid[p.y][p.x] === 0) grid[p.y][p.x] = 3;
     }
   }
 
