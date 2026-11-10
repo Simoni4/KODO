@@ -240,7 +240,9 @@ export const RaceView: React.FC<RaceViewProps> = ({
             curArena.finish,
             isCellWalkableSync,
             curArena.size,
-            curArena.size
+            curArena.size,
+            (fromX, fromY, toX, toY) =>
+              canStepBetweenSync(fromX, fromY, toX, toY)
           );
 
           if (path && path.length > 0) {
