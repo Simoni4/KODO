@@ -152,7 +152,7 @@ export function isRaceArenaFair(arena: RaceArena): boolean {
   };
 
   const results = spawns.map(stats);
-  return results[0].distance >= 0 &&
+  return results[0].distance >= 16 &&
     results[0].routes > 0 &&
     results.every((r) => r.distance === results[0].distance && r.routes === results[0].routes);
 }
