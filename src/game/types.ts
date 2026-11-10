@@ -72,6 +72,7 @@ export interface BotRacer {
   personality: 'aggressive' | 'cautious' | 'tricky';
   alive: boolean;
   score: number;
+  nextMoveAt?: number;
   fallAnimation?: number;
 }
 
