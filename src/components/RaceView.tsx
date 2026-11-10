@@ -261,6 +261,14 @@ export const RaceView: React.FC<RaceViewProps> = ({
           const moveChance = 0.76;
           if (Math.random() > moveChance) return bot;
 
+          // Personalities change only shortest-route tie-breaking, never movement speed.
+          const directionOrder =
+            bot.personality === 'aggressive'
+              ? [{ x: -1, y: 0 }, { x: 0, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 1 }]
+              : bot.personality === 'tricky'
+                ? [{ x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }, { x: 1, y: 0 }]
+                : [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: -1 }];
+
           const path = bfsShortestPath(
             { x: bot.x, y: bot.y },
             curArena.finish,
@@ -268,7 +276,8 @@ export const RaceView: React.FC<RaceViewProps> = ({
             curArena.size,
             curArena.size,
             (fromX, fromY, toX, toY) =>
-              canStepBetweenSync(fromX, fromY, toX, toY)
+              canStepBetweenSync(fromX, fromY, toX, toY),
+            directionOrder
           );
 
           if (path && path.length > 0) {
