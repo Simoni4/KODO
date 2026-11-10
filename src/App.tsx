@@ -12,6 +12,7 @@ import { HUD } from './components/HUD';
 import { CampaignView } from './components/CampaignView';
 import { RaceView } from './components/RaceView';
 import { SurvivalView } from './components/SurvivalView';
+import { ArenaView, ArenaResultsModal, ArenaPlacement } from './components/ArenaView';
 import { ModeSelectModal } from './components/ModeSelectModal';
 import {
   LevelSelectModal,
@@ -88,6 +89,7 @@ export default function App() {
   const [movesCount, setMovesCount] = useState<number>(0);
   const [raceRank, setRaceRank] = useState<number>(1);
   const [survivalAlive, setSurvivalAlive] = useState<number>(4);
+  const [arenaResults, setArenaResults] = useState<ArenaPlacement[] | null>(null);
   const [victoryStars, setVictoryStars] = useState<number>(3);
 
   const timerIntervalRef = useRef<any>(null);
@@ -156,6 +158,7 @@ export default function App() {
       setMovesCount(0);
       setShowVictory(false);
       setShowDefeat(false);
+      setArenaResults(null);
       KodoAudioManager.playHop();
       if (musicEnabled) {
         KodoAudioManager.startAmbientMusic();
@@ -191,6 +194,7 @@ export default function App() {
     setMovesCount(0);
     setShowVictory(false);
     setShowDefeat(false);
+    setArenaResults(null);
     setScreen('playing');
     setCountdown(3);
     KodoAudioManager.playHop();
@@ -270,6 +274,7 @@ export default function App() {
     setCountdown(null);
     setShowVictory(false);
     setShowDefeat(false);
+    setArenaResults(null);
     setShowModeSelect(false);
     setShowLevelSelect(false);
     setScreen('title');
@@ -327,7 +332,7 @@ export default function App() {
                   ? currentLevel.name
                   : mode === 'race'
                   ? `AI RACE · ${raceRank === 1 ? '1st' : raceRank === 2 ? '2nd' : raceRank === 3 ? '3rd' : '4th'} PLACE`
-                  : `SURVIVAL · ${survivalAlive}/4 ALIVE`
+                  : mode === 'survival' ? `SURVIVAL · ${survivalAlive}/4 ALIVE` : 'EAT ALL ARENA · 8 PLAYERS'
               }
               timeFormatted={formatTimer(timerSeconds)}
               stars={mode === 'campaign' ? levelStars[currentLevel.id] || 3 : 3}
@@ -346,7 +351,7 @@ export default function App() {
                   ? `Moves: ${movesCount}`
                   : mode === 'race'
                   ? 'Speed'
-                  : 'Shrinking'
+                   : mode === 'survival' ? 'Shrinking' : 'Eat rivals'
               }
             />
 
@@ -374,6 +379,17 @@ export default function App() {
                     }
                   }}
                   onRankChange={setRaceRank}
+                />
+              )}
+
+              {mode === 'arena' && (
+                <ArenaView
+                  key={`arena-${restartKey}`}
+                  isPaused={screen !== 'playing' || countdown !== null || showSettings || showLevelSelect || showModeSelect}
+                  onComplete={(placements) => {
+                    setArenaResults(placements);
+                    setScreen('gameover');
+                  }}
                 />
               )}
               {mode === 'survival' && (
@@ -464,6 +480,14 @@ export default function App() {
           />
         )}
 
+
+        {mode === 'arena' && arenaResults && (
+          <ArenaResultsModal
+            placements={arenaResults}
+            onRetry={handleRestart}
+            onMainMenu={handleMainMenu}
+          />
+        )}
         {showVictory && screen !== 'title' && (
           <VictoryModal
             title={mode === 'campaign' ? currentLevel.name : mode === 'race' ? 'AI Race Champion!' : 'Last Bird Standing!'}
