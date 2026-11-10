@@ -22,7 +22,7 @@ interface ArenaViewProps {
 const SIZE = 22;
 const COLORS = ['#f97316', '#a855f7', '#22c55e', '#eab308', '#ec4899', '#06b6d4', '#ef4444'];
 
-function createContestants(playerName = 'Player'): SurvivalEntity[] {
+function createContestants(playerName = 'Player', playerColor = '#0284c7'): SurvivalEntity[] {
   const starts = [
     [2, 2], [11, 2], [19, 2], [2, 11],
     [19, 11], [2, 19], [11, 19], [19, 19],
@@ -30,14 +30,14 @@ function createContestants(playerName = 'Player'): SurvivalEntity[] {
   const names = [playerName, 'Brr', 'Pip', 'Mochi', 'Frost', 'Kiwi', 'Nix', 'Bobo'];
   return starts.map(([x, y], i) => ({
     id: `arena-${i}`, name: names[i], x, y,
-    isPlayer: i === 0, color: i === 0 ? '#0284c7' : COLORS[i - 1], alive: true,
+    isPlayer: i === 0, color: i === 0 ? playerColor : COLORS[i - 1], alive: true,
   }));
 }
 
 export const ArenaView: React.FC<ArenaViewProps> = ({ isPaused = false, playerName = 'Player', playerColor = '#0284c7', onComplete, onPlayerEliminated }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rendererRef = useRef(new IsometricRenderer());
-  const [players, setPlayers] = useState<SurvivalEntity[]>(() => createContestants(playerName));
+  const [players, setPlayers] = useState<SurvivalEntity[]>(() => createContestants(playerName, playerColor));
   const [playerPlace, setPlayerPlace] = useState<number | null>(null);
   const playersRef = useRef(players);
   const [tiles] = useState<Map<string, SurvivalTileState>>(() => {
