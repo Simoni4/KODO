@@ -230,7 +230,11 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
           }
         }
 
-        const stableKeys = Array.from(next.keys()).filter((k) => next.get(k)?.state === 'stable');
+        const stableKeys = Array.from(next.keys()).filter((k) => {
+          const tile = next.get(k);
+          // Keep the tall perimeter fence intact; only the playable arena floor crumbles.
+          return tile?.state === 'stable' && (tile.elevation || 0) < 3;
+        });
         if (stableKeys.length > 4) {
           for (let i = 0; i < 2; i++) {
             const randIdx = Math.floor(Math.random() * stableKeys.length);
