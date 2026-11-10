@@ -136,7 +136,8 @@ export function isRaceArenaFair(arena: RaceArena): boolean {
   };
 
   const results=spawns.map(stats);
-  return results[0].distance >= 18 && results[0].routes >= 2 &&
+  const minimumDistance = size < 18 ? 1 : 18;
+  return results[0].distance >= minimumDistance && results[0].routes >= 2 &&
     results.every((r)=>r.distance===results[0].distance && r.routes===results[0].routes);
 }
 
