@@ -265,9 +265,17 @@ export const RaceView: React.FC<RaceViewProps> = ({
               ? [{ x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }, { x: 1, y: 0 }]
               : [{ x: 0, y: 1 }, { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: -1 }];
 
+        // Frosty becomes an active rival: when close, it breaks from the finish
+        // route to pressure Kodo and attempt a legal shove. Other bots keep racing.
+        const playerDistance = Math.abs(bot.x - nextPlayerPos.x) + Math.abs(bot.y - nextPlayerPos.y);
+        const botTarget =
+          bot.personality === 'aggressive' && playerDistance <= 4
+            ? nextPlayerPos
+            : curArena.finish;
+
         const path = bfsShortestPath(
           { x: bot.x, y: bot.y },
-          curArena.finish,
+          botTarget,
           isCellWalkableSync,
           curArena.size,
           curArena.size,
