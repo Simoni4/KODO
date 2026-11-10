@@ -127,9 +127,18 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
         const shovedX = botOnTarget.x + dx;
         const shovedY = botOnTarget.y + dy;
         // A bot cannot be pushed onto a walkable platform that is more than one level away.
+        const anotherBotAtShoveDestination = currentPlayers.some(
+          (other) =>
+            other.alive &&
+            !other.isPlayer &&
+            other.id !== botOnTarget.id &&
+            other.x === shovedX &&
+            other.y === shovedY
+        );
         if (
-          isCellStandingSync(shovedX, shovedY) &&
-          Math.abs(getTileElevationSync(shovedX, shovedY) - targetElev) > 1
+          anotherBotAtShoveDestination ||
+          (isCellStandingSync(shovedX, shovedY) &&
+            Math.abs(getTileElevationSync(shovedX, shovedY) - targetElev) > 1)
         ) {
           return;
         }
@@ -276,7 +285,7 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
           if (bot.isPlayer || !bot.alive) continue;
 
           const botElev = getTileElevationSync(bot.x, bot.y);
-          const neighbors = [
+          const legalNeighbors = [
             { x: bot.x, y: bot.y - 1 },
             { x: bot.x, y: bot.y + 1 },
             { x: bot.x - 1, y: bot.y },
@@ -287,10 +296,24 @@ export const SurvivalView: React.FC<SurvivalViewProps> = ({
               Math.abs(getTileElevationSync(n.x, n.y) - botElev) <= 1
           );
 
-          if (neighbors.length === 0) {
+          if (legalNeighbors.length === 0) {
             nextPlayers[i] = { ...bot, alive: false };
             continue;
           }
+
+          // Contestants cannot stack on one tile; if every legal tile is occupied, wait.
+          const neighbors = legalNeighbors.filter(
+            (n) =>
+              !nextPlayers.some(
+                (other) =>
+                  other.alive &&
+                  !other.isPlayer &&
+                  other.id !== bot.id &&
+                  other.x === n.x &&
+                  other.y === n.y
+              )
+          );
+          if (neighbors.length === 0) continue;
 
           const stableNeighbors = neighbors.filter((n) => {
             const t = tilesRef.current.get(`${n.x},${n.y}`);
