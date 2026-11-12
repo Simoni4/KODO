@@ -238,7 +238,7 @@ export const CharacterCustomizeModal: React.FC<{
       <div className="w-full max-w-sm rounded-3xl border-2 border-violet-400/40 bg-slate-900 p-5 shadow-2xl">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-black uppercase tracking-wide text-white">Customize Kodo</h2>
+            <h2 className="text-lg font-black uppercase tracking-wide text-white">Customize Friend</h2>
             <p className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-violet-300">Character preview</p>
           </div>
           <button onClick={onClose} aria-label="Close" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700">×</button>
@@ -247,7 +247,7 @@ export const CharacterCustomizeModal: React.FC<{
         <div className="relative mb-5 flex h-52 flex-col items-center justify-center overflow-hidden rounded-2xl border border-sky-400/20 bg-gradient-to-b from-sky-900 via-slate-900 to-slate-950">
           <div className="pointer-events-none absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle, rgba(186,230,253,.7) 1px, transparent 1.5px)', backgroundSize: '22px 22px' }} />
           <div className="absolute bottom-7 h-5 w-28 rounded-full bg-slate-950/70 blur-md" />
-          <svg viewBox="0 0 180 170" role="img" aria-label={selected.label + ' Kodo character preview'} className="relative z-10 h-40 w-40 overflow-visible" style={{ animation: 'kodo-preview-hop 1.45s ease-in-out infinite' }}>
+          <svg viewBox="0 0 180 170" role="img" aria-label={selected.label + ' Bouncy Friends character preview'} className="relative z-10 h-40 w-40 overflow-visible" style={{ animation: 'kodo-preview-hop 1.45s ease-in-out infinite' }}>
             <defs>
               <radialGradient id="kodo-body-gradient" cx="32%" cy="24%" r="78%">
                 <stop offset="0%" stopColor="#ffffff" stopOpacity=".58" />
@@ -301,7 +301,7 @@ export const CharacterCustomizeModal: React.FC<{
             </g>
           </svg>
           <div className="relative z-10 -mt-1 text-center">
-            <div className="text-sm font-black text-white">Your Kodo</div>
+            <div className="text-sm font-black text-white">Your Friend</div>
             <div className="text-[10px] font-semibold text-sky-200">{selected.label}</div>
           </div>
           <style>{`
