@@ -215,8 +215,8 @@ export const ArenaView: React.FC<ArenaViewProps> = ({ isPaused = false, playerNa
 };
 
 export const ArenaResultsModal: React.FC<{ placements: ArenaPlacement[]; onRetry: () => void; onMainMenu: () => void }> = ({ placements, onRetry, onMainMenu }) => (
-  <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm">
-    <div className="w-full max-w-sm rounded-3xl border-2 border-amber-400/50 bg-slate-900 p-5 text-center shadow-2xl">
+  <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bf-screen-overlay">
+    <div className="w-full max-w-sm bf-result-panel bf-victory-panel p-5 text-center">
       <div className="text-5xl mb-1">🏆</div>
       <h2 className="text-2xl font-black uppercase text-amber-300">1st Place</h2>
       <p className="text-sm text-slate-300 mb-4">{placements.find(p => p.place === 1)?.name || 'Winner'} wins the arena!</p>
