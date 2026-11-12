@@ -5,6 +5,8 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // GitHub Pages hosts this project under /KODO/; local Vite keeps the root path.
+    base: process.env.GITHUB_ACTIONS === 'true' ? '/KODO/' : '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
