@@ -329,7 +329,7 @@ export default function App() {
       </div>
 
       {/* Main Game Shell Frame */}
-      <main className="relative z-10 w-full h-full max-w-md sm:max-w-lg md:max-w-xl flex flex-col items-center justify-between shadow-2xl overflow-hidden bg-slate-950/30 backdrop-blur-xs">
+      <main className="relative z-10 w-full h-full max-w-md sm:max-w-lg md:max-w-xl flex flex-col items-center justify-between shadow-2xl overflow-hidden bg-transparent backdrop-blur-0 shadow-none">
         {/* Screen 1: TITLE SCREEN */}
         {screen === 'title' && (
           <TitleScreen
