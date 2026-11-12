@@ -98,4 +98,4 @@ img {
 .bf-hit-modes{left:4.2%;top:84.1%;width:22.4%;height:10.8%}
 .bf-hit-customize{left:28.5%;top:84.1%;width:25%;height:10.8%}
 .bf-hit-shop{position:absolute;z-index:4;left:53.8%;top:84.1%;width:24.3%;height:10.8%;pointer-events:none}
-.bf-duplicate-settings-cover{position:absolute;z-index:3;right:1.5%;bottom:1.5%;width:20.5%;height:12.5%;clip-path:polygon(0 36%,12% 19%,28% 12%,43% 23%,58% 10%,78% 20%,100% 34%,100% 100%,0 100%);background:radial-gradient(ellipse at 68% 24%,#fff 0 18%,#eaf7ff 43%,#c9e4f8 74%,#a6cceb 100%);filter:drop-shadow(0 -3px 5px rgba(63,119,166,.16));pointer-events:none}
+.bf-duplicate-settings-cover{position:absolute;z-index:3;right:1.5%;bottom:4.5%;width:20.5%;height:12.5%;clip-path:polygon(0 36%,12% 19%,28% 12%,43% 23%,58% 10%,78% 20%,100% 34%,100% 100%,0 100%);background:radial-gradient(ellipse at 68% 24%,#fff 0 18%,#eaf7ff 43%,#c9e4f8 74%,#a6cceb 100%);filter:drop-shadow(0 -3px 5px rgba(63,119,166,.16));pointer-events:none}
