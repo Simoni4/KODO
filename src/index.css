@@ -65,3 +65,24 @@ img {
 .bf-mode-art span { line-height:1; }
 @media (max-height:700px) { .bf-mascot-wrap { height:min(28vh,190px); } .bf-play-button { padding-top:.65rem; padding-bottom:.65rem; } .bf-nav-button { min-height:58px; } .bf-mode-card { min-height:82px; } .bf-mode-art { width:58px; height:58px; } }
 @media (prefers-reduced-motion: reduce) { .bf-bird-hop { animation:none; } }
+
+
+/* Full-bleed concept-inspired winter island menu */
+.bf-title{isolation:isolate;background:transparent}
+.bf-menu-vignette{background:linear-gradient(180deg,rgba(5,20,52,.1),rgba(7,24,59,.02) 38%,rgba(5,17,44,.48))}
+.bf-player-pill{background:linear-gradient(180deg,rgba(8,37,72,.86),rgba(5,20,49,.82));border:1px solid rgba(151,220,255,.42);box-shadow:0 5px 18px rgba(2,8,28,.3),inset 0 1px 0 rgba(255,255,255,.15);backdrop-filter:blur(8px)}
+.bf-wordmark{filter:drop-shadow(0 4px 0 #17458c) drop-shadow(0 9px 14px rgba(4,17,45,.55));-webkit-text-stroke:1.4px #17458c;paint-order:stroke fill}
+.bf-wordmark div:last-child{-webkit-text-stroke-color:#a84c16;filter:drop-shadow(0 3px 0 #9a451c)}
+.bf-island-scene{width:min(100%,430px);height:clamp(210px,34vh,330px);display:flex;align-items:center;justify-content:center;margin-top:0;filter:drop-shadow(0 18px 22px rgba(3,14,42,.35))}
+.bf-island-svg{display:block;width:100%;height:100%;overflow:visible}
+.bf-island-bird{transform-box:fill-box;transform-origin:center bottom;animation:bf-island-bounce 2.4s ease-in-out infinite}
+@keyframes bf-island-bounce{0%,100%{transform:translateY(2px) scale(1.01,.99)}42%{transform:translateY(-9px) scale(.99,1.02)}58%{transform:translateY(-8px) scale(.995,1.01)}}
+.bf-play-button{background:linear-gradient(180deg,#ffe77b,#ffc02e 45%,#f27b13);border:3px solid #fff3b6;box-shadow:0 6px 0 #a84a0c,0 13px 24px rgba(4,15,42,.42),inset 0 2px 0 rgba(255,255,255,.8);text-shadow:0 2px 2px rgba(130,54,0,.45);transition:transform .15s,filter .15s}
+.bf-play-button:active{transform:translateY(4px);box-shadow:0 2px 0 #a84a0c}
+.bf-nav-button{position:relative;display:flex;min-height:64px;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:19px;color:white;font-size:11px;font-weight:900;background:linear-gradient(180deg,#65b7f2,#347ac7 52%,#2054a2);border:2px solid rgba(213,241,255,.82);box-shadow:0 5px 0 #153c7b,0 9px 17px rgba(2,6,23,.34),inset 0 2px 0 rgba(255,255,255,.48)}
+.bf-nav-button:active{transform:translateY(3px);box-shadow:0 2px 0 #153c7b}
+.bf-nav-coming-soon{opacity:.82;filter:saturate(.75)}
+.bf-nav-coming-soon small{position:absolute;top:4px;right:7px;font-size:6px;letter-spacing:.08em;color:#fff2a5}
+@media(max-height:740px){.bf-island-scene{height:clamp(175px,29vh,235px)}.bf-play-button{padding-top:.6rem;padding-bottom:.6rem}.bf-nav-button{min-height:54px}}
+@media(max-width:390px){.bf-title{padding-left:12px;padding-right:12px}.bf-island-scene{height:clamp(185px,31vh,255px)}}
+@media(prefers-reduced-motion:reduce){.bf-island-bird{animation:none}}
