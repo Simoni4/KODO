@@ -1,5 +1,13 @@
 import React from 'react';
 
+export const MAIN_MENU_THEME = { id: 'aurora', name: 'Northern Lights Winter Biome', image: '/extracted/theme_aurora.jpg' };
+export const GAMEPLAY_THEMES = [
+  { id: 'mountains', name: 'Winter Peaks', image: '/extracted/theme_mountains.jpg' },
+  { id: 'sunset', name: 'Sunset Ridge', image: '/extracted/theme_sunset.jpg' },
+  { id: 'castle', name: 'Moonlit Castle', image: '/extracted/theme_castle.jpg' },
+  { id: 'aurora', name: 'Northern Lights', image: '/extracted/theme_aurora.jpg' },
+];
+
 interface TitleScreenProps {
   onPlay: () => void;
   onOpenCustomize: () => void;
