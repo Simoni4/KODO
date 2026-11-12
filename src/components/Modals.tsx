@@ -19,8 +19,8 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
   onClose,
 }) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs select-none">
-      <div className="relative w-full max-w-md max-h-[85vh] flex flex-col bg-slate-900 border-2 border-sky-500/40 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bf-screen-overlay select-none">
+      <div className="relative w-full max-w-md max-h-[85vh] flex flex-col bf-wood-panel overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Modal Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800 bg-slate-950/60">
           <div className="flex items-center gap-2">
@@ -119,8 +119,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [confirmReset, setConfirmReset] = React.useState(false);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs select-none">
-      <div className="relative w-full max-w-sm flex flex-col bg-slate-900 border-2 border-sky-500/40 rounded-3xl shadow-2xl overflow-hidden p-5 animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bf-screen-overlay select-none">
+      <div className="relative w-full max-w-sm flex flex-col bf-wood-panel overflow-hidden p-5 animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between pb-3 border-b border-slate-800">
           <h2 className="text-lg font-black text-white uppercase tracking-wider">Settings</h2>
           <button
@@ -234,8 +234,8 @@ export const CharacterCustomizeModal: React.FC<{
   const selected = colors.find((option) => option.value === color) || colors[0];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-xs">
-      <div className="w-full max-w-sm rounded-3xl border-2 border-violet-400/40 bg-slate-900 p-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bf-screen-overlay">
+      <div className="w-full max-w-sm bf-wood-panel p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-black uppercase tracking-wide text-white">Customize Friend</h2>
@@ -368,8 +368,8 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
   hasNext,
 }) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-xs select-none">
-      <div className="relative w-full max-w-sm flex flex-col items-center bg-gradient-to-b from-slate-900 to-sky-950 border-3 border-amber-400/80 rounded-3xl shadow-2xl p-6 text-center animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bf-screen-overlay select-none">
+      <div className="relative w-full max-w-sm flex flex-col items-center bf-result-panel bf-victory-panel p-6 text-center animate-in zoom-in-95 duration-200">
         {/* Victory Stars Header */}
         <div className="flex items-center justify-center gap-2 mb-3">
           {[1, 2, 3].map((starIdx) => (
@@ -473,7 +473,7 @@ export const DefeatModal: React.FC<DefeatModalProps> = ({
 }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-xs select-none">
-      <div className="relative w-full max-w-sm flex flex-col items-center bg-gradient-to-b from-slate-900 to-rose-950 border-3 border-rose-500/80 rounded-3xl shadow-2xl p-6 text-center animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-sm flex flex-col items-center bf-result-panel bf-defeat-panel p-6 text-center animate-in zoom-in-95 duration-200">
         <div className="w-14 h-14 rounded-full bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center mb-3 text-rose-300 text-2xl font-black">
           ✕
         </div>
@@ -536,7 +536,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({
 }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs select-none">
-      <div className="relative w-full max-w-xs flex flex-col items-center bg-slate-900 border-2 border-sky-500/40 rounded-3xl shadow-2xl p-5 text-center animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-xs flex flex-col items-center bf-wood-panel p-5 text-center animate-in zoom-in-95 duration-200">
         <h2 className="text-xl font-black text-white uppercase tracking-wider mb-4">
           Game Paused
         </h2>
