@@ -86,3 +86,16 @@ img {
 @media(max-height:740px){.bf-island-scene{height:clamp(175px,29vh,235px)}.bf-play-button{padding-top:.6rem;padding-bottom:.6rem}.bf-nav-button{min-height:54px}}
 @media(max-width:390px){.bf-title{padding-left:12px;padding-right:12px}.bf-island-scene{height:clamp(185px,31vh,255px)}}
 @media(prefers-reduced-motion:reduce){.bf-island-bird{animation:none}}
+
+
+/* The approved title concept is the menu artwork, not a CSS recreation. */
+.bf-concept-screen{position:relative;width:100%;height:100%;min-height:0;overflow:hidden;isolation:isolate;background:#172c61}
+.bf-concept-art{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:fill;user-select:none;-webkit-user-drag:none}
+.bf-concept-hit{position:absolute;z-index:5;display:block;padding:0;border:0;background:transparent;border-radius:24px;cursor:pointer;outline-offset:-4px}
+.bf-concept-hit:focus-visible{outline:3px solid #fff38b;background:rgba(255,255,255,.08)}
+.bf-hit-settings{left:81.2%;top:1.1%;width:17.7%;height:9.4%}
+.bf-hit-play{left:19.2%;top:70.4%;width:62%;height:12.1%}
+.bf-hit-modes{left:4.2%;top:84.1%;width:22.4%;height:10.8%}
+.bf-hit-customize{left:28.5%;top:84.1%;width:25%;height:10.8%}
+.bf-hit-shop{position:absolute;z-index:4;left:53.8%;top:84.1%;width:24.3%;height:10.8%;pointer-events:none}
+.bf-duplicate-settings-cover{position:absolute;z-index:3;right:1.5%;bottom:1.5%;width:20.5%;height:12.5%;clip-path:polygon(0 36%,12% 19%,28% 12%,43% 23%,58% 10%,78% 20%,100% 34%,100% 100%,0 100%);background:radial-gradient(ellipse at 68% 24%,#fff 0 18%,#eaf7ff 43%,#c9e4f8 74%,#a6cceb 100%);filter:drop-shadow(0 -3px 5px rgba(63,119,166,.16));pointer-events:none}
