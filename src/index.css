@@ -159,3 +159,13 @@ img {
 @media(max-height:740px){.bf-home-screen{padding-top:10px;padding-bottom:8px}.bf-island-scene{height:clamp(160px,27vh,220px)}.bf-main-play{min-height:58px}.bf-home-nav-button{min-height:58px}.bf-mode-tile{min-height:170px}.bf-mode-tile-art{min-height:100px}}
 @media(max-width:360px){.bf-mode-screen{padding:11px}.bf-mode-grid{gap:8px}.bf-mode-tile{min-height:165px}.bf-mode-tile-copy p{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.bf-main-play,.bf-home-nav-button,.bf-mode-tile{transition:none}}
+
+
+/* Shared in-game HUD skin */
+.bf-hud-pill{background:linear-gradient(110deg,#1255a0eF,#0b2d6beF);border:2px solid #85d8ff99;box-shadow:0 4px 0 #08295899,inset 0 1px 0 #ffffff33;backdrop-filter:blur(8px)}
+.bf-hud-timer{background:#09265dd9;border:1px solid #8bcfff66;color:#ffe071;box-shadow:0 3px 9px #06183d66}
+.bf-hud-stars{background:#09265ddd;border:2px solid #a9dfff66;box-shadow:0 4px 10px #06183d66}
+.bf-hud-icon{color:#eafaff;background:linear-gradient(180deg,#55b5f7,#1762ba);border:2px solid #c5edff;box-shadow:0 4px 0 #16417f,0 7px 13px #071d4b88,inset 0 1px 0 #fff9}
+.bf-hud-hint{background:#09265dd9;border:1px solid #8bcfff66;color:#e2f5ff;box-shadow:0 4px 10px #06183d66;backdrop-filter:blur(8px)}
+.bf-hud-action{background:linear-gradient(180deg,#5eb5f5,#1b5eae);border:2px solid #bce8ff;color:white;box-shadow:0 4px 0 #143e7c,0 7px 12px #071d4b77}
+.bf-hud-next{background:linear-gradient(180deg,#ffe879,#ffc02e 48%,#ef7710);border:2px solid #fff1ad;color:white;text-shadow:0 2px 2px #a84b12;box-shadow:0 4px 0 #a84a0c,0 7px 12px #071d4b77}
