@@ -1,50 +1,52 @@
 import React, { useEffect, useState } from 'react';
 
 export const KodoHeroMascot: React.FC = () => {
-  const [blink, setBlink] = useState(false);
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setBlink(true);
-      window.setTimeout(() => setBlink(false), 160);
-    }, 3100);
-    return () => window.clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="flex w-full flex-col items-center justify-center">
-      <div className="bf-wordmark relative z-10 mb-[-8px] text-center">
-        <div className="text-[clamp(2.5rem,12vw,4.4rem)] font-black leading-[0.88] tracking-tight text-white">Bouncy</div>
-        <div className="mt-1 text-[clamp(2.7rem,13vw,4.7rem)] font-black leading-[0.9] tracking-tight text-amber-300">Friends</div>
-      </div>
-      <div className="bf-mascot-wrap relative mt-1 flex h-[min(34vh,250px)] w-full items-center justify-center">
-        <div className="absolute bottom-5 h-5 w-36 rounded-full bg-slate-950/35 blur-md" />
-        <svg viewBox="0 0 220 220" role="img" aria-label="Blue bird mascot" className="relative z-10 h-full max-w-full overflow-visible">
-          <defs>
-            <radialGradient id="bfBirdBody" cx="34%" cy="22%" r="80%"><stop offset="0%" stopColor="#7dd3fc"/><stop offset="48%" stopColor="#168bd4"/><stop offset="100%" stopColor="#07539a"/></radialGradient>
-            <linearGradient id="bfBirdBelly" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#fff"/><stop offset="1" stopColor="#cdeaff"/></linearGradient>
-            <linearGradient id="bfBirdScarf" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#ff7777"/><stop offset="1" stopColor="#c92342"/></linearGradient>
-          </defs>
-          <ellipse cx="110" cy="198" rx="54" ry="9" fill="#071b3a" opacity=".28"/>
-          <g className="bf-bird-hop">
-            <path d="M65 112 Q27 96 35 137 Q43 159 76 145Z" fill="#0866ad"/>
-            <path d="M155 112 Q193 96 185 137 Q177 159 144 145Z" fill="#0866ad"/>
-            <ellipse cx="110" cy="117" rx="65" ry="70" fill="url(#bfBirdBody)"/>
-            <ellipse cx="110" cy="145" rx="43" ry="38" fill="url(#bfBirdBelly)"/>
-            <path d="M77 62 Q63 29 86 43 L104 62Z" fill="#168bd4"/>
-            <path d="M101 57 Q105 20 124 43 L121 63Z" fill="#38bdf8"/>
-            <path d="M119 62 Q143 31 150 53 L132 76Z" fill="#0b70b8"/>
-            <ellipse cx="83" cy="103" rx="20" ry="24" fill="white"/>
-            <ellipse cx="137" cy="103" rx="20" ry="24" fill="white"/>
-            {blink ? <><path d="M68 106 Q83 116 98 106" stroke="#102b4e" strokeWidth="5" fill="none" strokeLinecap="round"/><path d="M122 106 Q137 116 152 106" stroke="#102b4e" strokeWidth="5" fill="none" strokeLinecap="round"/></> : <><ellipse cx="87" cy="105" rx="10" ry="14" fill="#102b4e"/><ellipse cx="133" cy="105" rx="10" ry="14" fill="#102b4e"/><circle cx="90" cy="99" r="4" fill="white"/><circle cx="136" cy="99" r="4" fill="white"/></>}
-            <ellipse cx="67" cy="137" rx="11" ry="6" fill="#f68ca4" opacity=".55"/><ellipse cx="153" cy="137" rx="11" ry="6" fill="#f68ca4" opacity=".55"/>
-            <path d="M94 125 L126 125 L110 148Z" fill="#ffad20" stroke="#d56a0b" strokeWidth="2"/>
-            <path d="M70 151 Q110 164 150 151 L146 169 Q110 183 74 169Z" fill="url(#bfBirdScarf)"/>
-            <path d="M124 164 L145 166 L143 198 Q134 204 126 195Z" fill="#e43c50"/>
-            <path d="M130 168 L139 169 L138 195 L130 194Z" fill="#ff8790" opacity=".65"/>
-            <ellipse cx="87" cy="190" rx="17" ry="7" fill="#f6a21a"/><ellipse cx="134" cy="190" rx="17" ry="7" fill="#e98b10"/>
-          </g>
-        </svg>
-      </div>
-    </div>
-  );
+  const [blink,setBlink]=useState(false);
+  useEffect(()=>{const id=window.setInterval(()=>{setBlink(true);window.setTimeout(()=>setBlink(false),150)},3200);return()=>window.clearInterval(id)},[]);
+  return <div className="bf-island-scene" aria-label="A floating snowy island with the blue Bouncy Friends bird">
+    <svg viewBox="0 0 520 390" role="img" className="bf-island-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="isSnow" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fff"/><stop offset=".55" stopColor="#dff6ff"/><stop offset="1" stopColor="#8dc9ee"/></linearGradient>
+        <linearGradient id="isRock" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#659fc2"/><stop offset="1" stopColor="#15365f"/></linearGradient>
+        <radialGradient id="isBird" cx="28%" cy="15%" r="85%"><stop stopColor="#9ceaff"/><stop offset=".48" stopColor="#39a9ed"/><stop offset="1" stopColor="#0757a8"/></radialGradient>
+        <linearGradient id="isGold" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#fff18b"/><stop offset="1" stopColor="#f18a12"/></linearGradient>
+        <filter id="isBlur"><feGaussianBlur stdDeviation="8"/></filter>
+      </defs>
+      <ellipse cx="260" cy="349" rx="190" ry="19" fill="#061632" opacity=".38" filter="url(#isBlur)"/>
+      <path d="M65 207 260 105 455 207 260 322Z" fill="url(#isRock)" stroke="#9ce4ff" strokeWidth="2"/>
+      <path d="M65 207 260 322V354L65 241Z" fill="#28577d"/><path d="M260 322 455 207V241L260 354Z" fill="#15395f"/>
+      <g stroke="#9bdcff" strokeWidth="2" strokeLinejoin="round">
+        <path d="M65 207 112 183 159 207 112 232Z" fill="url(#isSnow)"/><path d="M112 183 159 159 206 183 159 207Z" fill="#fff"/>
+        <path d="M159 207 206 183 253 207 206 232Z" fill="url(#isSnow)"/><path d="M206 183 253 159 300 183 253 207Z" fill="#eafaff"/>
+        <path d="M253 207 300 183 347 207 300 232Z" fill="url(#isSnow)"/><path d="M300 183 347 159 394 183 347 207Z" fill="#fff"/>
+        <path d="M347 207 394 183 441 207 394 232Z" fill="url(#isSnow)"/>
+        <path d="M89 254 136 230 183 254 136 278Z" fill="#e6f8ff"/><path d="M136 230 183 207 230 230 183 254Z" fill="#fff"/>
+        <path d="M183 254 230 230 277 254 230 278Z" fill="url(#isSnow)"/><path d="M230 230 277 207 324 230 277 254Z" fill="#eafaff"/>
+        <path d="M277 254 324 230 371 254 324 278Z" fill="#fff"/><path d="M324 230 371 207 418 230 371 254Z" fill="url(#isSnow)"/>
+        <path d="M136 278 183 254 230 278 183 302Z" fill="url(#isSnow)"/><path d="M230 278 277 254 324 278 277 302Z" fill="#fff"/><path d="M324 278 371 254 418 278 371 302Z" fill="url(#isSnow)"/>
+      </g>
+      <g>
+        <path d="M111 181v35M111 120 78 177l23-5-29 29 39-9 39 9-28-29 23 5Z" fill="#145078" stroke="#8de2fa" strokeWidth="3"/>
+        <path d="M390 170v37M390 108 355 169l24-5-31 29 42-9 42 9-29-29 24 5Z" fill="#12486e" stroke="#8de2fa" strokeWidth="3"/>
+      </g>
+      <ellipse cx="357" cy="187" rx="35" ry="13" fill="#5de0ff" opacity=".3" filter="url(#isBlur)"/>
+      <path d="M338 203v-44a20 20 0 0 1 40 0v44" fill="none" stroke="#8deaff" strokeWidth="12"/><path d="M338 203v-44a20 20 0 0 1 40 0v44" fill="none" stroke="#f1fdff" strokeWidth="4"/>
+      <path d="M358 139V99" stroke="#f1f8ff" strokeWidth="4"/><path d="m360 101 39 11-39 11Z" fill="#ff626b" stroke="#fff0d0" strokeWidth="2"/><circle cx="358" cy="98" r="5" fill="#ffd65a"/>
+      <path d="M174 178v17" stroke="#e9f8ff" strokeWidth="3"/><path d="M165 194q9-10 18 0l-3 17h-12Z" fill="#ffd05b" stroke="#fff2b2" strokeWidth="2"/>
+      <ellipse cx="254" cy="290" rx="52" ry="11" fill="#09264c" opacity=".3" filter="url(#isBlur)"/>
+      <g className="bf-island-bird">
+        <path d="M218 229q-30-23-24 16 4 16 32 9M290 229q30-23 24 16-4 16-32 9" fill="#1768ad"/>
+        <ellipse cx="254" cy="231" rx="48" ry="51" fill="url(#isBird)" stroke="#bcefff" strokeWidth="2"/>
+        <ellipse cx="254" cy="250" rx="31" ry="27" fill="#f6fdff"/>
+        <path d="m226 194-13-27q25 4 39 31M247 191q5-32 23-8l-4 18M267 197q21-25 29-4l-17 18" fill="#36a9ed"/>
+        <ellipse cx="236" cy="224" rx="14" ry="17" fill="white"/><ellipse cx="272" cy="224" rx="14" ry="17" fill="white"/>
+        {blink?<><path d="M225 227q11 8 22 0M261 227q11 8 22 0" stroke="#102b4e" strokeWidth="4" fill="none" strokeLinecap="round"/></>:<><ellipse cx="238" cy="225" rx="7" ry="10" fill="#102b4e"/><ellipse cx="274" cy="225" rx="7" ry="10" fill="#102b4e"/><circle cx="240" cy="221" r="3" fill="white"/><circle cx="276" cy="221" r="3" fill="white"/></>}
+        <ellipse cx="217" cy="246" rx="8" ry="5" fill="#ff9eb2" opacity=".7"/><ellipse cx="291" cy="246" rx="8" ry="5" fill="#ff9eb2" opacity=".7"/>
+        <path d="m242 239h24l-12 17Z" fill="url(#isGold)" stroke="#d9790d" strokeWidth="1.5"/>
+        <path d="M219 258q35 14 70 0l-4 13q-31 14-62 0Z" fill="#e84955" stroke="#ff9a9d" strokeWidth="2"/><path d="m271 267 14 0-2 27q-7 6-14-2Z" fill="#d9364c"/>
+        <path d="M229 286q10-5 18 1l-2 9q-13 4-21-3ZM260 287q10-5 19 0l3 8q-13 5-24 0Z" fill="url(#isGold)"/>
+      </g>
+      <g fill="#fff"><circle cx="61" cy="148" r="3"/><circle cx="457" cy="151" r="2.5"/><circle cx="308" cy="83" r="3"/><path d="m55 91 4 9 9 3-9 4-4 9-4-9-9-4 9-3Z"/><path d="m455 73 4 8 8 3-8 4-4 8-3-8-8-4 8-3Z"/></g>
+    </svg>
+  </div>;
 };
