@@ -28,12 +28,12 @@ export const HUD: React.FC<HUDProps> = ({
   extraBadge,
 }) => {
   return (
-    <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-3 sm:p-5 select-none z-20">
+    <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-3 sm:p-5 select-none z-20 bf-game-hud">
       {/* Top Bar matching reference */}
       <div className="flex items-center justify-between w-full">
         {/* Left cluster: Level Pill & Timer */}
         <div className="flex flex-col gap-1.5">
-          <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-slate-900/85 border border-sky-400/40 shadow-lg backdrop-blur-xs text-white">
+          <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-2xl bf-hud-pill text-white">
             <span className="font-extrabold text-xs sm:text-sm tracking-wide text-sky-200">
               {title}
             </span>
@@ -44,7 +44,7 @@ export const HUD: React.FC<HUDProps> = ({
             )}
           </div>
 
-          <div className="pointer-events-auto flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900/70 border border-slate-700/60 shadow-md text-amber-300 text-xs font-mono font-bold tabular-nums">
+          <div className="pointer-events-auto flex items-center gap-1.5 px-3 py-1 rounded-xl bf-hud-timer text-xs font-mono font-bold tabular-nums">
             <Clock className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
             <span>{timeFormatted}</span>
           </div>
@@ -53,7 +53,7 @@ export const HUD: React.FC<HUDProps> = ({
         {/* Right cluster: Stars & Utility buttons */}
         <div className="flex items-center gap-2">
           {/* Stars */}
-          <div className="pointer-events-auto flex items-center gap-1 px-2.5 py-1.5 rounded-2xl bg-slate-900/80 border border-slate-700/60 shadow-lg">
+          <div className="pointer-events-auto flex items-center gap-1 px-2.5 py-1.5 rounded-2xl bf-hud-stars">
             {Array.from({ length: maxStars }).map((_, i) => (
               <Star
                 key={i}
@@ -70,7 +70,7 @@ export const HUD: React.FC<HUDProps> = ({
           <button
             onClick={onPause}
             aria-label="Pause Game"
-            className="pointer-events-auto w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-b from-slate-700 to-slate-900 hover:from-slate-600 hover:to-slate-800 border-2 border-slate-600/60 active:scale-95 shadow-lg flex items-center justify-center text-sky-200 transition-transform cursor-pointer"
+            className="pointer-events-auto w-9 h-9 sm:w-10 sm:h-10 rounded-xl bf-hud-icon active:scale-95 flex items-center justify-center transition-transform cursor-pointer"
           >
             <Pause className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
           </button>
@@ -91,7 +91,7 @@ export const HUD: React.FC<HUDProps> = ({
       {/* Bottom Bar: Clean, spacious (no D-pad buttons!) */}
       <div className="flex items-end justify-between w-full pb-2">
         {/* Left: Tap-to-move hint indicator badge */}
-        <div className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-slate-950/70 border border-sky-400/30 text-[11px] text-sky-200/90 font-medium shadow-lg backdrop-blur-xs">
+        <div className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bf-hud-hint text-[11px] font-medium">
           <Navigation className="w-3.5 h-3.5 text-amber-300 animate-spin" style={{ animationDuration: '4s' }} />
           <span>Tap screen to hop</span>
         </div>
@@ -101,7 +101,7 @@ export const HUD: React.FC<HUDProps> = ({
           <button
             onClick={onRestart}
             aria-label="Restart Level"
-            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-gradient-to-b from-slate-700 to-slate-900 hover:from-slate-600 hover:to-slate-800 border-2 border-slate-600/70 text-slate-200 text-xs sm:text-sm font-bold shadow-xl active:scale-95 cursor-pointer uppercase tracking-wider"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bf-hud-action text-xs sm:text-sm font-bold active:scale-95 cursor-pointer uppercase tracking-wider"
           >
             <RotateCcw className="w-4 h-4 text-sky-400" />
             <span>Restart</span>
@@ -111,7 +111,7 @@ export const HUD: React.FC<HUDProps> = ({
             <button
               onClick={onNext}
               aria-label="Next Level"
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-gradient-to-b from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 border-2 border-amber-300 text-white text-xs sm:text-sm font-extrabold shadow-xl shadow-orange-950/50 active:scale-95 cursor-pointer uppercase tracking-wider"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bf-hud-next text-xs sm:text-sm font-extrabold active:scale-95 cursor-pointer uppercase tracking-wider"
             >
               <span>Next</span>
               <SkipForward className="w-4 h-4 fill-current" />
